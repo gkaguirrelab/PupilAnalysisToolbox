@@ -33,10 +33,7 @@ load(fullfile(thePath, theFile));
 if isfield(params, 'mergeState') && params.mergeState
     commandwindow;
     fprintf('*** File has already been merged.\n');
-    force = GetWithDefault('Do you want to continue?', 0);
-    if ~force
-        return;
-    end
+    return;
 end
 
 if nFilesRaw ~= length(params.dataStruct)
