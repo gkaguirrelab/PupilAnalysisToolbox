@@ -5,13 +5,9 @@ function PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, ol
 %% MAIN ROUTINE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-% Now loop across subjects and perform the analysis
-
+% Loop across subjects and perform the analysis
 for SubjectID=1:length(Subjects)
-    
     % Clear out variables from the prior subject
-    
     clear Data;
     clear TimeSeries;
     clear TimeSeriesMatrix;
@@ -31,55 +27,40 @@ for SubjectID=1:length(Subjects)
     clear theValid;
     clear theMeanMatrix;
     
-    
-    
-    
-    % Prepeare plot figures for this subject
-    
+    % Prepare plot figures for this subject
     if (params.TrialInspectorFlag==1)
         figTrialInspector=figure;
         pause on;
     end
-
-    SubjectAnon = ['S' num2str(SubjectID)];
     
+    % Display some information
     fprintf(['\n>>> Processing subject '...
         char(Subjects(SubjectID))]); % Notify user
     fprintf(['\n\t*** Loading and concatenating sessions for subject '...
         char(Subjects(SubjectID))]); % Notify user
     
     % Loop over sessions and directions for a subject and concatenate the data
-    
     FirstGoodSessionFlag=1;
-    
     for sess=1:3
         for p=1:length(Protocols)
-            
             % Load data set
             [TempData,TempTrialFrequencies,TempTrialPhases,TempTrialDirections,TempAlphaSpacing,TempDateTime]=...
                 PupilAnalysisToolbox_LoadData(basePath, char(Protocols(p)),char(Subjects(SubjectID)),sess);
             
             if (not(isempty(TempData)))
-                
                 fprintf('.'); % Notify user
-                
-                % Keep AlphaSpacing
-                
-                AlphaSpacing=TempAlphaSpacing;
                 
                 % The first two trials are discarded from the primary analysis for each session, as they
                 % correspond to the adaptation period and the initial wrap-around trial
                 % The first trial is kept, however, and averaged for the
                 % subject across all directions to provide the response for
                 % adaptation to the background.
-                
                 BackgroundAdaptData(sess,p)=TempData(1);
                 
                 TempData(1)=[]; TempTrialFrequencies(1)=[]; TempTrialDirections(1)=[]; TempTrialPhases(1)=[];
                 TempData(2)=[]; TempTrialFrequencies(2)=[]; TempTrialDirections(2)=[]; TempTrialPhases(2)=[];
                 
                 % Now remove those trials that have insufficient time points
-                
                 NumTrials = length(TempData);
                 trial = 1;
                 while (trial<NumTrials)
@@ -94,7 +75,6 @@ for SubjectID=1:length(Subjects)
                 end
                 
                 % Now concatenate TempData to the full Data array
-                
                 if (FirstGoodSessionFlag==1)
                     Data = TempData;
                     TrialFrequencies = TempTrialFrequencies;
@@ -116,24 +96,12 @@ for SubjectID=1:length(Subjects)
     
     fprintf('done.'); % Notify user
     
-    % Define some variables to hold the processed data
-    
-    %     TimeSeries=zeros(length(Data),datalen);
-    %     MeanPupilByTrial=zeros(1,length(Data));
-    %     AmplitudesByTrial=zeros(1,length(Data));
-    %     PhasesByTrial=zeros(1,length(Data));
-    
     % Smooth, interpolate, and de-spike the data
-    %  Calculate and store mean pupil, amplitude, and phase
-    
     fprintf(['\n\t*** Smoothing and interpolating ' num2str(length(Data)) ' trials:  ']); % Update user
-    
     trialCounter=1;
     
     for trial=1:length(Data)
-        
         % Run a trial counter unless the TrialInspector flag is set
-        
         if (params.TrialInspectorFlag~=1)
             for j=0:log10(trial-1)
                 fprintf('\b');          % delete previous counter display
@@ -150,30 +118,22 @@ for SubjectID=1:length(Subjects)
         % negative value, but the subsequent SGolaySmooth step will handle
         % this and return a vector that is just from time point zero
         % onward.
-        
         Data(trial).time=Data(trial).time-params.StimOnsetDelay;
         
         % smooth, interpolate, and resample the data
-        
         iy=SGolaySmooth(Data(trial).time,Data(trial).diameter,params.sgolay_span,params.sgolay_polynomial,params.sampling_frequency,params.full_trial_length);
         
         % clip to params.full_trial_length
-        
         iy=iy(1:params.full_trial_length*params.sampling_frequency);
         
         % Temporarily crop to params.final_trial_length to allow corrections of
         % phase offsets in the stimuli.
         % Check to make sure that we are not asking for a final trial
         % length longer than the full trial length
-        
         if (params.final_trial_length>params.full_trial_length)
             error('params.final_trial_length must be less than or equal to params.full_trial_length')
         end
-        
         iy=iy((params.full_trial_length-params.final_trial_length)*params.sampling_frequency+1:params.full_trial_length*params.sampling_frequency);
-        
-        
-        
         
         % Align to zero stimulus phase. Phase shifting of the stimuli is in
         % units of the stimulus modulation, which is typically implemented
@@ -209,10 +169,11 @@ for SubjectID=1:length(Subjects)
         end
         
     end
+    
     trialCounter = trial+1;
+    
     % Trim the data variables to account for any skipped trials due to
     % exceeding the allowable proportion of NaNs
-    
     TimeSeries=TimeSeries(1:trialCounter-1,:);
     TrialFrequencies = TrialFrequencies(1:trialCounter-1);
     TrialDirections = TrialDirections(1:trialCounter-1);
@@ -225,15 +186,12 @@ for SubjectID=1:length(Subjects)
     end
     
     fprintf('done.'); % notify user we are done the loop
-    
     fprintf(['\n\t*** Found ' num2str(trialCounter-1) ' good trials.']);
     
     % Allocate variables to hold results
-    
     % Create an average time-series for each unique frequency and direction
     % crossing. Calculate for these the best fit, amplitude and phase.
     % Also, calculate a noise level bootstrap for each crossing.
-    
     UniqueFreqs=unique(TrialFrequencies);
     UniqueDirections=unique(TrialDirections);
     
@@ -257,7 +215,6 @@ for SubjectID=1:length(Subjects)
     Alpha=(params.full_trial_length*params.sampling_frequency)/(SigmaSamp*2);
     GaussModel=gausswin(params.full_trial_length*params.sampling_frequency,Alpha);
     
-    
     GaussModel=fshift(GaussModel,round(params.full_trial_length*params.sampling_frequency/4));
     mkdir(fullfile(resultsPath, char(Subjects(SubjectID))));
     cd(fullfile(resultsPath, char(Subjects(SubjectID))));
@@ -270,14 +227,11 @@ for SubjectID=1:length(Subjects)
                 fprintf('\b'); % delete previous counter display
             end
             fprintf('%d', IterationCount); % update progress dots
-            
             Indices = find(and((TrialFrequencies==UniqueFreqs(f)),strcmp(TrialDirections,UniqueDirections(d))));
             if (not(isempty(Indices)))
-                
                 % Create the average time series. This is done by first
                 %  assembling a matrix across time-series, and then using
                 %  the nanmean to handle NaN points
-                
                 for i=1:length(Indices)
                     if (i==1)
                         TimeSeriesMatrix=[TimeSeries(Indices(i),:)'];
@@ -290,7 +244,6 @@ for SubjectID=1:length(Subjects)
                 TimeSeriesMatrix = ((TimeSeriesMatrix-repmat(theMean, size(TimeSeriesMatrix, 1), 1))./repmat(theMean, size(TimeSeriesMatrix, 1), 1));
                 theRemoveIdx = find(sum(abs(TimeSeriesMatrix) > 0.5));
                 theRemoveIdxReverse = find(~(sum(abs(TimeSeriesMatrix) > 0.5)));
-                
                 TimeSeriesMatrix(:, theRemoveIdx) = [];
                 theMean(:, theRemoveIdx) = [];
                 theValid(Indices(theRemoveIdxReverse)) = 1;
@@ -302,15 +255,11 @@ for SubjectID=1:length(Subjects)
                     iy(removePoints)=NaN;
                     TimeSeriesMatrix(:, m) = iy;
                 end
-                
-                
             end
-            
             MeanMatrix{f,d,:} = theMean;
             AvgTimeSeries(f,d,:)=nanmean(TimeSeriesMatrix,2);
             SEMTimeSeries(f,d,:)=nanstd(TimeSeriesMatrix, [], 2)/sqrt(size(TimeSeriesMatrix,2 ));
             TimeSeriesMatrixStore{f, d} = TimeSeriesMatrix;
-            
             if isempty(strfind(UniqueDirectionLabels{d}, 'Background'));
                 if params.SaveDataFlag
                     csvwrite([char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '_TimeSeries.csv'], TimeSeriesMatrix);
@@ -318,16 +267,14 @@ for SubjectID=1:length(Subjects)
             end
         end % if indices is not length zero
     end % for number of unique directions
-    
     for j=0:log10(IterationCount-1)
         fprintf('\b'); % delete previous counter display
     end
     fprintf('done.'); % notify user we are done the loop
     
-    
-    
     timeVector = 0:1/params.sampling_frequency:params.final_trial_length-1/params.sampling_frequency;
     
+    % Plot the time series
     for d=1:length(UniqueDirections)
         figure;
         hold on;
@@ -338,17 +285,13 @@ for SubjectID=1:length(Subjects)
         pbaspect([1 1 1]);
         title(strrep(UniqueDirectionLabels{d}, '_', ' '));
         plot([5 5], [-0.4 0.4], 'r');
-        
         ylim([-0.4 0.4]);
-        
         M = [timeVector(1:600)' squeeze(AvgTimeSeries(:, d, 1:600))];
-        
         if params.SaveDataFlag
             % Save out mean pupil size
             csvwrite([char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '.csv'], M);
             csvwrite([char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '_Mean.csv'], MeanMatrix{1, d,:});
         end
-        
         if params.SavePlotFlag
             % Save out the plot
             set(gca, 'TickDir', 'out');
@@ -358,8 +301,5 @@ for SubjectID=1:length(Subjects)
             close(gcf);
         end
     end
-    
     fprintf('\n');
-    
-    
 end % main
