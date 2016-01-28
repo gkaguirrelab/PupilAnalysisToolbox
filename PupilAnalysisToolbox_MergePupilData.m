@@ -37,7 +37,11 @@ if isfield(params, 'mergeState') && params.mergeState
 end
 
 if nFilesRaw ~= length(params.dataStruct)
-   error('*** Number of data files does not lign up with what is expected. Aborting');
+   fprintf('*** Number of data files does not lign up with what is expected.\n');
+   contWithMerging = GetWithDefault(['Continue to merge ' num2str(nFilesRaw) ' raw data files.'], 1);
+   if ~contWithMerging
+     return;  
+   end
 end
 
 
@@ -45,55 +49,56 @@ for j = 1:nFilesRaw
     % Load in the raw pupil data
     load(fullfile(thePath, theFileName, theFilesRaw(j).name));
     fprintf('>> Loading file %g / %g ...', j, nFilesRaw);
-    params.dataStruct(j).diameter = dataStruct.diameter;
-    params.dataStruct(j).time = dataStruct.time;
-    params.dataStruct(j).time_inter = dataStruct.time_inter;
+    dataStructNew(j).diameter = dataStruct.diameter;
+    dataStructNew(j).time = dataStruct.time;
+    dataStructNew(j).time_inter = dataStruct.time_inter;
     if isempty(dataStruct.time_inter)
-        params.dataStruct(j).time_inter = 0;
+        dataStructNew(j).time_inter = 0;
     end
     OVERWRITE_DIRECTION = false;
     if OVERWRITE_DIRECTION
         tmp = allwords(params.cacheFileName{params.theDirections(j)}, '-');
-        params.dataStruct(j).direction = [tmp{2}];
+        dataStructNew(j).direction = [tmp{2}];
     end
     tmp0 = params.cacheFileName(params.theDirections);
     if ~isempty(strfind(tmp0{j}, 'Background-45s'));
         phaseSet = [0 90 180 270];
         idx = randi(length(phaseSet), 1);
-        params.dataStruct(j).frequencyCarrier = 0.1;
-        params.dataStruct(j).phaseCarrier = phaseSet(idx);
-        params.dataStruct(j).modulationMode = 'FM';
+        dataStructNew(j).frequencyCarrier = 0.1;
+        dataStructNew(j).phaseCarrier = phaseSet(idx);
+        dataStructNew(j).modulationMode = 'FM';
     end
-    params.dataStruct(j).modulationMode = 'pulse';
-    if strcmp(params.dataStruct(j).modulationMode, 'pulse')
+    dataStructNew(j).modulationMode = 'pulse';
+    if strcmp(dataStructNew(j).modulationMode, 'pulse')
         theShifts = 0:5;
-        params.dataStruct(j).frequencyCarrier = 0;
-        params.dataStruct(j).frequencyEnvelope = 0;
-        params.dataStruct(j).phaseRandSec = theShifts(params.thePhaseIndices(j));
+        dataStructNew(j).frequencyCarrier = 0;
+        dataStructNew(j).frequencyEnvelope = 0;
+        dataStructNew(j).phaseRandSec = theShifts(params.thePhaseIndices(j));
     end
     % The following section is commented out; this will need to be
     % addressed at a later point.
     %     if ~isempty(strfind(protocol, 'CRF'))
-    %         params.dataStruct(j).direction = [params.dataStruct(j).direction '_CRF_' num2str(abs(params.dataStruct(j).contrastRelMax)*42, '%02.fpct')];
+    %         dataStructNew(j).direction = [dataStructNew(j).direction '_CRF_' num2str(abs(dataStructNew(j).contrastRelMax)*42, '%02.fpct')];
     %     elseif ~isempty(strfind(protocol, 'DoublePulse'))
-    %         if params.dataStruct(j).contrastRelMax >= 0
-    %             params.dataStruct(j).direction = [params.dataStruct(j).direction '_DoublePulse_' num2str(abs(params.dataStruct(j).contrastRelMax)*42, '%02.fpct')];
-    %         elseif params.dataStruct(j).contrastRelMax <0
-    %             params.dataStruct(j).direction = [params.dataStruct(j).direction '_DoublePulse_-' num2str(abs(params.dataStruct(j).contrastRelMax)*42, '%02.fpct')];
+    %         if dataStructNew(j).contrastRelMax >= 0
+    %             dataStructNew(j).direction = [dataStructNew(j).direction '_DoublePulse_' num2str(abs(dataStructNew(j).contrastRelMax)*42, '%02.fpct')];
+    %         elseif dataStructNew(j).contrastRelMax <0
+    %             dataStructNew(j).direction = [dataStructNew(j).direction '_DoublePulse_-' num2str(abs(dataStructNew(j).contrastRelMax)*42, '%02.fpct')];
     %         end
     %     else
-    params.dataStruct(j).contrastRelMax = 1;
+    dataStructNew(j).contrastRelMax = 1;
     %end
     
     % Save out some of the raw pupil stuff
-    params.dataStruct(j).rawTimeStamps = pupilData.timeStamps;
-    params.dataStruct(j).rawPupilDiameter = pupilData.pupilDiameter;
-    params.dataStruct(j).rawMmPositions = pupilData.mmPositions;
-    params.dataStruct(j).rawFickPositions = pupilData.fickPositions;
-    params.dataStruct(j).rawHelmholtzPositions = pupilData.helmholtzPositions;
+    dataStructNew(j).rawTimeStamps = pupilData.timeStamps;
+    dataStructNew(j).rawPupilDiameter = pupilData.pupilDiameter;
+    dataStructNew(j).rawMmPositions = pupilData.mmPositions;
+    dataStructNew(j).rawFickPositions = pupilData.fickPositions;
+    dataStructNew(j).rawHelmholtzPositions = pupilData.helmholtzPositions;
     fprintf('done.\n');
 end
 
+params.dataStruct = dataStructNew;
 params.mergeState = true;
 save(fullfile(thePath, theFile), 'params', 'exp', 'svnInfo');
 fprintf('*** All merging finished.\n');
