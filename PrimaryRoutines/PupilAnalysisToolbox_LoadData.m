@@ -1,4 +1,4 @@
-function [Data,TrialFrequencies,TrialPhases,TrialDirections,timeStepStim,DateTime] = DataLoaderFlickerSensitivity(Protocol,Subject,Session)
+function [Data,TrialFrequencies,TrialPhases,TrialDirections,timeStepStim,DateTime] = PupilAnalysisToolbox_LoadData(basePath, Protocol,Subject,Session)
 
 % Extract the data path directly from this file.
 
@@ -21,7 +21,7 @@ function [Data,TrialFrequencies,TrialPhases,TrialDirections,timeStepStim,DateTim
 %dataDirStem = ['/Users/Shared/Matlab/experiments/OneLight/OLPupilDiameter/data/'];
 dataDirStem = '/Users/Shared/Matlab/Experiments/OneLight/OLFlickerSensitivity/data';
 
-dataDir = fullfile(dataDirStem, Protocol, Subject);
+dataDir = fullfile(basePath, Subject);
 inputFile = [Subject '-' Protocol '-' num2str(Session) '.mat'];
 
 
@@ -42,7 +42,7 @@ if (exist(fullfile(dataDir, inputFile),'file')==2)
     TrialDirections={''};
     for i=1:length(Data)
         TrialDirections(i)=(TrialDirectionLabels(TrialDirectionCodes(i)));
-        TrialDirections(i) = {Data(i).direction};
+        %TrialDirections(i) = {Data(i).direction};
     end % Assemble a string array of modulation direction cache file names
     
     TrialPhases = [Data.phaseCarrier];

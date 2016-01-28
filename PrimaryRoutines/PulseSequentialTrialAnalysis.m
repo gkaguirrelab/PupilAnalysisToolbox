@@ -1,57 +1,5 @@
-function [TimeSeries]=PulseSequentialTrialAnalysis(...
-    sampling_frequency,...
-    full_trial_length,...
-    final_trial_length,...
-    minimum_length_trial,...
-    spike_remover_params,...
-    sgolay_span,...
-    sgolay_polynomial,...
-    BadPercentChangeThreshold,...
-    BadNanThreshold,...
-    Subjects,...
-    Protocols,...
-    SyntheticIsoFlag,...
-    SaveDataFlag,...
-    SavePlotsFlag,...
-    RelabelDirections,...
-    newLabels,...
-    oldLabels,...
-    ResultsDirName,...
-    configFileNames,...
-    whichSttingIndexToValidate,...
-    TrialInspectorFlag,...
-    StimOnsetDelay);
-
-
-
-% Add the OLPupilDiameter folder to the path. Different conventions.
-if isdir('/Users/Shared/Matlab/Experiments/OLPupilDiameter/');
-    basePath = '/Users/Shared/Matlab/Experiments/OLPupilDiameter';
-elseif isdir('/Users/Shared/Matlab/Experiments/OneLight/OLPupilDiameter/');
-    basePath = '/Users/Shared/Matlab/Experiments/OneLight/OLPupilDiameter';
-end
-
-ResultsFullPath = fullfile(basePath, 'analysis', 'results');
-
-% Calculate the  length of our data vectors
-
-datalen = full_trial_length*sampling_frequency;
-
-% Set up some figure windows
-
-maxSubplots = length(Subjects);
-figMeanPupilByDirection = figure;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% RETRIEVE CONTRASTS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% We want to obtain the contrasts that each of the photoreceptors gets.
-% This is done with a call to OLPDCalculateContrast(...).
-configPath = fullfile(basePath, 'code', 'config');
-
-% Load the config files. We hard code 0 in there. This is the index for
-% which we want to calculate contrasts. That is 90 deg phase angle when we
-% have a stimulus titration with 200 steps between 0 and 2*pi.
+function PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath)
+% PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MAIN ROUTINE
@@ -88,16 +36,16 @@ for SubjectID=1:length(Subjects)
     
     % Prepeare plot figures for this subject
     
-    if (TrialInspectorFlag==1)
+    if (params.TrialInspectorFlag==1)
         figTrialInspector=figure;
         pause on;
     end
-    
-    figSparkLinePlots(SubjectID) = figure;
-    
+
     SubjectAnon = ['S' num2str(SubjectID)];
     
-    fprintf(['\nLoading and concatenating sessions for subject '...
+    fprintf(['\n>>> Processing subject '...
+        char(Subjects(SubjectID))]); % Notify user
+    fprintf(['\n\t*** Loading and concatenating sessions for subject '...
         char(Subjects(SubjectID))]); % Notify user
     
     % Loop over sessions and directions for a subject and concatenate the data
@@ -109,7 +57,7 @@ for SubjectID=1:length(Subjects)
             
             % Load data set
             [TempData,TempTrialFrequencies,TempTrialPhases,TempTrialDirections,TempAlphaSpacing,TempDateTime]=...
-                DataLoaderFlickerSensitivity(char(Protocols(p)),char(Subjects(SubjectID)),sess);
+                PupilAnalysisToolbox_LoadData(basePath, char(Protocols(p)),char(Subjects(SubjectID)),sess);
             
             if (not(isempty(TempData)))
                 
@@ -135,7 +83,7 @@ for SubjectID=1:length(Subjects)
                 NumTrials = length(TempData);
                 trial = 1;
                 while (trial<NumTrials)
-                    if ((TempData(trial).time(end)/1000) < minimum_length_trial)
+                    if ((TempData(trial).time(end)/1000) < params.minimum_length_trial)
                         TempData(trial) = [];
                         TempTrialFrequencies(trial) = [];
                         TempTrialDirections(trial) = [];
@@ -166,7 +114,7 @@ for SubjectID=1:length(Subjects)
         end % loop over directions
     end % loop over sessions
     
-    fprintf('done\n'); % Notify user
+    fprintf('done.'); % Notify user
     
     % Define some variables to hold the processed data
     
@@ -178,7 +126,7 @@ for SubjectID=1:length(Subjects)
     % Smooth, interpolate, and de-spike the data
     %  Calculate and store mean pupil, amplitude, and phase
     
-    fprintf(['\nSmoothing and interpolating ' num2str(length(Data)) ' trials:  ']); % Update user
+    fprintf(['\n\t*** Smoothing and interpolating ' num2str(length(Data)) ' trials:  ']); % Update user
     
     trialCounter=1;
     
@@ -186,7 +134,7 @@ for SubjectID=1:length(Subjects)
         
         % Run a trial counter unless the TrialInspector flag is set
         
-        if (TrialInspectorFlag~=1)
+        if (params.TrialInspectorFlag~=1)
             for j=0:log10(trial-1)
                 fprintf('\b');          % delete previous counter display
             end
@@ -196,33 +144,33 @@ for SubjectID=1:length(Subjects)
         end
         
         % Shift the time stamps in the data array back by the
-        % StimOnsetDelay value. This accounts for the delay in the onset of
+        % params.StimOnsetDelay value. This accounts for the delay in the onset of
         % the stimulus modulation relative to the time stamps on the pupil
         % size measurements. This will result in some time stamps having a
         % negative value, but the subsequent SGolaySmooth step will handle
         % this and return a vector that is just from time point zero
         % onward.
         
-        Data(trial).time=Data(trial).time-StimOnsetDelay;
+        Data(trial).time=Data(trial).time-params.StimOnsetDelay;
         
         % smooth, interpolate, and resample the data
         
-        iy=SGolaySmooth(Data(trial).time,Data(trial).diameter,sgolay_span,sgolay_polynomial,sampling_frequency,full_trial_length);
+        iy=SGolaySmooth(Data(trial).time,Data(trial).diameter,params.sgolay_span,params.sgolay_polynomial,params.sampling_frequency,params.full_trial_length);
         
-        % clip to full_trial_length
+        % clip to params.full_trial_length
         
-        iy=iy(1:full_trial_length*sampling_frequency);
+        iy=iy(1:params.full_trial_length*params.sampling_frequency);
         
-        % Temporarily crop to final_trial_length to allow corrections of
+        % Temporarily crop to params.final_trial_length to allow corrections of
         % phase offsets in the stimuli.
         % Check to make sure that we are not asking for a final trial
         % length longer than the full trial length
         
-        if (final_trial_length>full_trial_length)
-            error('final_trial_length must be less than or equal to full_trial_length')
+        if (params.final_trial_length>params.full_trial_length)
+            error('params.final_trial_length must be less than or equal to params.full_trial_length')
         end
         
-        iy=iy((full_trial_length-final_trial_length)*sampling_frequency+1:full_trial_length*sampling_frequency);
+        iy=iy((params.full_trial_length-params.final_trial_length)*params.sampling_frequency+1:params.full_trial_length*params.sampling_frequency);
         
         
         
@@ -241,7 +189,7 @@ for SubjectID=1:length(Subjects)
         % advancement of zero.
         
         AmountToShift= TrialPhases(trial)*...  % Length of stimulus cycle in seconds
-            sampling_frequency*...;  % number of data samples per second
+            params.sampling_frequency*...;  % number of data samples per second
             (1);    % we need to phase advance
         
         % fshift implements a sinc shift, as we may have a non-integer shift
@@ -252,7 +200,7 @@ for SubjectID=1:length(Subjects)
         TimeSeries(trial, :) = tmp;
         % Store the mean pupil size.
         
-        if (TrialInspectorFlag==1)
+        if (params.TrialInspectorFlag==1)
             figure(figTrialInspector);
             plot(iy,'k');
             hold off;
@@ -270,15 +218,15 @@ for SubjectID=1:length(Subjects)
     TrialDirections = TrialDirections(1:trialCounter-1);
     TrialPhases = TrialPhases(1:trialCounter-1);
     
-    if ~(TrialInspectorFlag==1)
+    if ~(params.TrialInspectorFlag==1)
         for j=0:log10(trial-1)
             fprintf('\b'); % delete previous counter display
         end
     end
     
-    fprintf('done\n'); % notify user we are done the loop
+    fprintf('done.'); % notify user we are done the loop
     
-    fprintf(['Found ' num2str(trialCounter-1) ' good trials.']);
+    fprintf(['\n\t*** Found ' num2str(trialCounter-1) ' good trials.']);
     
     % Allocate variables to hold results
     
@@ -289,31 +237,31 @@ for SubjectID=1:length(Subjects)
     UniqueFreqs=unique(TrialFrequencies);
     UniqueDirections=unique(TrialDirections);
     
-    % Prepare some variables to hold the results
+    % Clean up the direction labels
+    for d = 1:length(UniqueDirections)
+        tmp0 = allwords(UniqueDirections{d}, '-');
+        UniqueDirectionLabels{d} = tmp0{2};
+    end
     
-    
-    % Create a vector that contains the Gaussian stimulation
-    
-    FWHM=3.8; % width of the stimulation Gaussian in seconds
-    Sigma=FWHM/2.355; % Sigma of the Gaussian in seconds
-    SigmaSamp=Sigma*sampling_frequency; % Sigma now in units of data samples
-    Alpha=(full_trial_length*sampling_frequency)/(SigmaSamp*2);
-    GaussModel=gausswin(full_trial_length*sampling_frequency,Alpha);
-    
-    % A hard-coded kludge. The Gaussian pulse was shifted back one-quarter
-    % of the total duration of the trial
-    UniqueDirectionLabels = UniqueDirections;
-    if (RelabelDirections==1)
+    if (params.RelabelDirections==1)
         for i = 1:length(oldLabels)
             ix = find(strcmp(UniqueDirectionLabels, oldLabels{i}));
             UniqueDirectionLabels{ix} = newLabels{i};
         end
     end
-    GaussModel=fshift(GaussModel,round(full_trial_length*sampling_frequency/4));
-    cd(ResultsFullPath)
-    mkdir(ResultsDirName)
-    cd(ResultsDirName);
-    fprintf(['\nAveraging ' num2str(length(UniqueFreqs)*length(UniqueDirections)) ' crossings of frequency and direction: ']); % Update user
+    % Create a vector that contains the Gaussian stimulation
+    
+    FWHM=3.8; % width of the stimulation Gaussian in seconds
+    Sigma=FWHM/2.355; % Sigma of the Gaussian in seconds
+    SigmaSamp=Sigma*params.sampling_frequency; % Sigma now in units of data samples
+    Alpha=(params.full_trial_length*params.sampling_frequency)/(SigmaSamp*2);
+    GaussModel=gausswin(params.full_trial_length*params.sampling_frequency,Alpha);
+    
+    
+    GaussModel=fshift(GaussModel,round(params.full_trial_length*params.sampling_frequency/4));
+    mkdir(fullfile(resultsPath, char(Subjects(SubjectID))));
+    cd(fullfile(resultsPath, char(Subjects(SubjectID))));
+    fprintf(['\n\t*** Averaging ' num2str(length(UniqueFreqs)*length(UniqueDirections)) ' crossings of frequency and direction: ']); % Update user
     
     for f=1:length(UniqueFreqs)
         for d=1:length(UniqueDirections)
@@ -348,9 +296,9 @@ for SubjectID=1:length(Subjects)
                 theValid(Indices(theRemoveIdxReverse)) = 1;
                 for m = 1:size(TimeSeriesMatrix, 2)
                     iy = TimeSeriesMatrix(:, m);
-                    [iy, indx]=SpikeRemover(iy,spike_remover_params);
+                    [iy, indx]=SpikeRemover(iy,params.spike_remover_params);
                     
-                    removePoints = find(abs(iy)>BadPercentChangeThreshold);
+                    removePoints = find(abs(iy)>params.BadPercentChangeThreshold);
                     iy(removePoints)=NaN;
                     TimeSeriesMatrix(:, m) = iy;
                 end
@@ -364,7 +312,9 @@ for SubjectID=1:length(Subjects)
             TimeSeriesMatrixStore{f, d} = TimeSeriesMatrix;
             
             if isempty(strfind(UniqueDirectionLabels{d}, 'Background'));
-                csvwrite([char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '_TimeSeries.csv'], TimeSeriesMatrix);
+                if params.SaveDataFlag
+                    csvwrite([char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '_TimeSeries.csv'], TimeSeriesMatrix);
+                end
             end
         end % if indices is not length zero
     end % for number of unique directions
@@ -372,224 +322,44 @@ for SubjectID=1:length(Subjects)
     for j=0:log10(IterationCount-1)
         fprintf('\b'); % delete previous counter display
     end
-    fprintf('done\n'); % notify user we are done the loop
+    fprintf('done.'); % notify user we are done the loop
     
     
     
-    timeVector = 0:1/sampling_frequency:final_trial_length-1/sampling_frequency;
+    timeVector = 0:1/params.sampling_frequency:params.final_trial_length-1/params.sampling_frequency;
     
-    for d=2:length(UniqueDirections)
-        subplot(2, ceil((length(UniqueDirections)-1)/2), d-1);
+    for d=1:length(UniqueDirections)
+        figure;
         hold on;
         %plot(timeVector(1:400), squeeze(AvgTimeSeries(:, d, 1:400)), '-k');
+        plot([5+params.StepDurSecs 5+params.StepDurSecs], [-0.4 0.4], 'r'); hold on;
         shadedErrorBar(timeVector(1:600), squeeze(AvgTimeSeries(:, d, 1:600)), squeeze(SEMTimeSeries(:, d, 1:600)));
         plot([timeVector(1) timeVector(600)], [0 0]', '-', 'Color', [0.2 0.2 0.2]);
         pbaspect([1 1 1]);
         title(strrep(UniqueDirectionLabels{d}, '_', ' '));
         plot([5 5], [-0.4 0.4], 'r');
-        plot([10 10], [-0.4 0.4], 'r'); hold on;
+        
         ylim([-0.4 0.4]);
         
         M = [timeVector(1:600)' squeeze(AvgTimeSeries(:, d, 1:600))];
         
-        csvwrite([char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '.csv'], M);
+        if params.SaveDataFlag
+            % Save out mean pupil size
+            csvwrite([char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '.csv'], M);
+            csvwrite([char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '_Mean.csv'], MeanMatrix{1, d,:});
+        end
         
-        
-        % Save out mean pupil size
-        csvwrite([char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '_Mean.csv'], MeanMatrix{1, d,:});
+        if params.SavePlotFlag
+            % Save out the plot
+            set(gca, 'TickDir', 'out');
+            set(gcf, 'PaperPosition', [0 0 4 4]); %Position plot at left hand corner with width 15 and height 6.
+            set(gcf, 'PaperSize', [4 4]); %Set the paper to have width 15 and height 6.
+            saveas(gcf, [char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '.pdf'], 'pdf');
+            close(gcf);
+        end
     end
     
-    set(gcf, 'PaperPosition', [0 0 12 6]); %Position plot at left hand corner with width 15 and height 6.
-    set(gcf, 'PaperSize', [12 6]); %Set the paper to have width 15 and height 6.
+    fprintf('\n');
     
-    
-    
-    saveas(gcf, [char(Subjects(SubjectID)) '_PupilPulseData.pdf'], 'pdf');
-    close(gcf);
-    
-    
-    
-    %
-    %     shadedErrorBar(timeVector(1:400), squeeze(AvgTimeSeries(:, 3, 1:400)), squeeze(SEMTimeSeries(:, 3, 1:400)), {'Color', 'r'}); hold on;
-    %     shadedErrorBar(timeVector(1:400), squeeze(AvgTimeSeries(:, 5, 1:400)), squeeze(SEMTimeSeries(:, 5, 1:400)), {'Color', 'b'});
-    %         shadedErrorBar(timeVector(1:400), squeeze(AvgTimeSeries(:, d, 1:400)), squeeze(SEMTimeSeries(:, d, 1:400)));
-    %     plot([timeVector(1) timeVector(400)], [0 0]', '-', 'Color', [0.2 0.2 0.2]);
-    %                     plot([5 5], [-0.1 0.15], 'k');
-    %             plot([10 10], [-0.15 0.15], 'k'); hold on;
-    %                         pbaspect([1 1 1]);
-    %                         ylim([-0.13 0.13]);
-    %                 set(gcf, 'PaperPosition', [0 0 4 4]); %Position plot at left hand corner with width 15 and height 6.
-    %     set(gcf, 'PaperSize', [4 4]); %Set the paper to have width 15 and height 6.
-    %
-    %     saveas(gcf, 'PupilPulseDataLMSMel.pdf', 'pdf');
-    %     close(gcf);
-    %     fprintf('\nPlot results.\n'); % Notify user
-    %
-    %
-    %     % Make a different label vector for plotting purposes
-    %     UniqueDirectionLabels = UniqueDirections;
-    %     if (RelabelDirections==1)
-    %         for i = 1:length(oldLabels)
-    %             ix = find(strcmp(UniqueDirectionLabels, oldLabels{i}));
-    %             UniqueDirectionLabels{ix} = newLabels{i};
-    %         end
-    %     end
-    %
-    %     %% Create the sparkline plots
-    %
-    %     ErrorMultiplier=2; % Plots ±2SEM on time series sparklines
-    %
-    %     % first need to determine a constant Y-range across all plot cells
-    %     for f=1:length(UniqueFreqs)
-    %         for d=1:length(UniqueDirections)
-    %             MaxYRange(f,d) = nanmax([ nanmax(squeeze(AvgTimeSeries(f,d,:))+ErrorMultiplier*squeeze(SEMTimeSeries(f,d,:))) nanmax(squeeze(AvgModelFits(f,d,:)))])  ;
-    %             MinYRange(f,d) = nanmin([ nanmin(squeeze(AvgTimeSeries(f,d,:))-ErrorMultiplier*squeeze(SEMTimeSeries(f,d,:))) nanmin(squeeze(AvgModelFits(f,d,:)))])  ;
-    %         end
-    %     end
-    %     yRange=[min(min(MinYRange)) max(max(MaxYRange))];
-    %     yRange(1)=floor(yRange(1)*100)/100;
-    %     yRange(2)=ceil(yRange(2)*100)/100;
-    %
-    %     % Now make the plots. One column for each direction
-    %
-    %     figure(figSparkLinePlots(SubjectID));
-    %     SuperPlotTitle=['Subject ' char(SubjectAnon) '/Responses and fits [' num2str(yRange(1)) ',' num2str(yRange(2)) ']'];
-    %     annotation('textbox', [0 0.9 1 0.1], ...
-    %         'String', SuperPlotTitle, ...
-    %         'EdgeColor', 'none', ...
-    %         'HorizontalAlignment', 'center', ...
-    %         'FontSize',12)
-    %     if (and(length(UniqueDirections)==1,length(UniqueFreqs)==1))
-    %         PlotTitle=char(UniqueDirectionLabels(1));
-    %         RowLabels=num2str(UniqueFreqs);
-    %         PlotOLPupilSparklines(AvgTimeSeries(:,d,:),AvgModelFits(:,d,:),SEMTimeSeries(:,d,:), ErrorMultiplier, yRange, figSparkLinePlots(SubjectID), RowLabels, PlotTitle, 1, 1);
-    %     else % if we only have one crossing of freq and direction, else...
-    %
-    %         for d=1:length(UniqueDirections)
-    %             PlotTitle=char(UniqueDirectionLabels(d));
-    %             RowLabels=num2str(UniqueFreqs);
-    %             PlotOLPupilSparklines(squeeze(AvgTimeSeries(:,d,:)),squeeze(AvgModelFits(:,d,:)),squeeze(SEMTimeSeries(:,d,:)),ErrorMultiplier,yRange, figSparkLinePlots(SubjectID), RowLabels, PlotTitle, d, length(UniqueDirections));
-    %         end
-    %     end % if statement catching edge case of one crossing of freq and direction
-    %
-    %
-    %
-    %     %% Plot avg pupil size by direction and frequency
-    %
-    %     PlotData=AvgMeanPupilByFxD;
-    %     PlotErrors=StdMeanPupilByFxD*2;
-    %
-    %     PlotTitle=['Subject ' char(SubjectAnon) '/Mean Pupil Diameter [±2SD]'];
-    %     PlotOLPupilTTFD(UniqueFreqs,UniqueDirectionLabels,PlotData,PlotErrors,PlotTitle,'Pupil diameter [mm]',[0 max(max(PlotData))+max(max(PlotErrors))],figMeanPupilByDirection,SubjectID,maxSubplots);
-    %
-    %
-    %
-    %     %     % Save out the data
-    %     %
-    %     %     if (SaveDataFlag==1)
-    %     %
-    %     %         currDir=pwd;
-    %     %
-    %     %         cd(ResultsFullPath)
-    %     %         if ~exist(ResultsDirName)
-    %     %             mkdir(ResultsDirName)
-    %     %         end
-    %     %
-    %     %         cd(ResultsDirName);
-    %     %
-    %     %         dataFile = sprintf('%s-results.csv', Subjects{SubjectID});
-    %     %         c = CSVFile(dataFile, true);
-    %     %
-    %     %         phase = AvgTimeSeriesPhases;
-    %     %         amplitude = AvgTimeSeriesAmplitudes;
-    %     %         phaseError = StdPhaseSplitHalfAvgTimeSeries;
-    %     %         amplitudeError = StdAmplitudeSplitHalfAvgTimeSeries;
-    %     %
-    %     %         allDirections = repmat(UniqueDirectionLabels, length(UniqueFreqs), 1);
-    %     %         c = c.addColumn('Direction', 's');
-    %     %         c = c.setColumnData('Direction', allDirections(:));
-    %     %
-    %     %         c = c.addColumn('Frequency [Hz]', 'g');
-    %     %         c = c.setColumnData('Frequency [Hz]', repmat(UniqueFreqs', length(UniqueDirectionLabels), 1));
-    %     %
-    %     %         c = c.addColumn('Pupil size mean [mm]', 'g');
-    %     %         c = c.setColumnData('Pupil size mean [mm]', AvgMeanPupilByFxD(:));
-    %     %
-    %     %         c = c.addColumn('Pupil size error [1SD]', 'g');
-    %     %         c = c.setColumnData('Pupil size error [1SD]', StdMeanPupilByFxD(:));
-    %     %
-    %     %         c = c.addColumn('Amplitude mean [proportion change]', 'g');
-    %     %         c = c.setColumnData('Amplitude mean [proportion change]', amplitude(:));
-    %     %
-    %     %         c = c.addColumn('Phase mean (±pi)', 'g');
-    %     %         c = c.setColumnData('Phase mean (±pi)', phase(:));
-    %     %
-    %     %         c = c.addColumn('Amplitude error [1SD]', 'g');
-    %     %         c = c.setColumnData('Amplitude error [1SD]', amplitudeError(:));
-    %     %
-    %     %         c = c.addColumn('Phase error [1SD]', 'g');
-    %     %         c = c.setColumnData('Phase error [1SD]', phaseError(:));
-    %     %
-    %     %         % Add contrasts (if config filenames were passed)
-    %     %         if ~(isempty(configFileNames))
-    %     %             for r = 1:length(receptorNames)
-    %     %                 % Target contrasts
-    %     %                 c = c.addColumn([receptorNames{r} ' contrast (target)'], 'g');
-    %     %                 tmpData = (round(repmat(contrastTarget(:, r), 1, length(UniqueFreqs))*1000)/1000)';
-    %     %                 c = c.setColumnData([receptorNames{r} ' contrast (target)'], tmpData(:));
-    %     %
-    %     %                 % Predicted contasts (with dark)
-    %     %                 c = c.addColumn([receptorNames{r} ' contrast (predicted)'], 'g');
-    %     %                 tmpData = (round(repmat(contrastPredicted(:, r), 1, length(UniqueFreqs))*1000)/1000)';
-    %     %                 c = c.setColumnData([receptorNames{r} ' contrast (predicted)'], tmpData(:));
-    %     %             end
-    %     %         end
-    %     %
-    %     %         c.write;
-    %     %
-    %     %         cd(currDir);
-    %     %     end % if SaveDataFlag
-    %     %
-    %     % end % subject loop
-    %     %
-    %     % fprintf('\nDone all subjects.\n'); % Notify user
-    %     %
-    %     %% Save out the plots
-    %
-    %     if (SavePlotsFlag==1)
-    %
-    %         fprintf('\nNow saving plots to disk.\n'); % Notify user
-    %
-    %         currDir=pwd;
-    %
-    %         cd(ResultsFullPath)
-    %         if ~exist(ResultsDirName)
-    %             mkdir(ResultsDirName)
-    %         end
-    %
-    %         cd(ResultsDirName);
-    %
-    %
-    %         % Save Avg Pupil size figure
-    %         set(figMeanPupilByDirection, 'PaperPosition', [0 0 8 5]); %Position plot at left hand corner with width 5 and height 5.
-    %         set(figMeanPupilByDirection, 'PaperSize', [8 5]); %Set the paper to have width 5 and height 5.
-    %         saveas(figMeanPupilByDirection, 'mean_pupil_size_subjects.pdf', 'pdf');
-    %
-    %         % Save polar plots and sparkline plots
-    %         for SubjectID=1:length(Subjects)
-    %
-    %             set(figSparkLinePlots(SubjectID), 'PaperPosition', [0 0 8 5]); %Position plot at left hand corner with width 5 and height 5.
-    %             set(figSparkLinePlots(SubjectID), 'PaperSize', [8 5]); %Set the paper to have width 5 and height 5.
-    %             SubjectAnon = ['S' num2str(SubjectID)];
-    %             saveas(figSparkLinePlots(SubjectID), ['sparkline_plot_subject_' char(SubjectAnon) '.pdf'], 'pdf');
-    %
-    %         end  % loop across subjects
-    %
-    %
-    %         cd(currDir);
-    %     end % if SavePlotsFlag
-    %
-    %
-    %     pause off;
     
 end % main

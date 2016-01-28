@@ -37,11 +37,11 @@ if isfield(params, 'mergeState') && params.mergeState
 end
 
 if nFilesRaw ~= length(params.dataStruct)
-   fprintf('*** Number of data files does not lign up with what is expected.\n');
-   contWithMerging = GetWithDefault(['Continue to merge ' num2str(nFilesRaw) ' raw data files.'], 1);
-   if ~contWithMerging
-     return;  
-   end
+    fprintf('*** Number of data files does not lign up with what is expected.\n');
+    contWithMerging = GetWithDefault(['Continue to merge ' num2str(nFilesRaw) ' raw data files.'], 1);
+    if ~contWithMerging
+        return;
+    end
 end
 
 
@@ -55,11 +55,8 @@ for j = 1:nFilesRaw
     if isempty(dataStruct.time_inter)
         dataStructNew(j).time_inter = 0;
     end
-    OVERWRITE_DIRECTION = false;
-    if OVERWRITE_DIRECTION
-        tmp = allwords(params.cacheFileName{params.theDirections(j)}, '-');
-        dataStructNew(j).direction = [tmp{2}];
-    end
+    tmp = allwords(params.cacheFileName{params.theDirections(j)}, '-');
+    dataStructNew(j).direction = [tmp{2}];
     tmp0 = params.cacheFileName(params.theDirections);
     if ~isempty(strfind(tmp0{j}, 'Background-45s'));
         phaseSet = [0 90 180 270];
@@ -71,8 +68,10 @@ for j = 1:nFilesRaw
     dataStructNew(j).modulationMode = 'pulse';
     if strcmp(dataStructNew(j).modulationMode, 'pulse')
         theShifts = 0:5;
-        dataStructNew(j).frequencyCarrier = 0;
-        dataStructNew(j).frequencyEnvelope = 0;
+        dataStructNew(j).frequencyCarrier = -1;
+        dataStructNew(j).frequencyEnvelope = -1;
+        dataStructNew(j).phaseCarrier = -1;
+        dataStructNew(j).phaseEnvelope = -1;
         dataStructNew(j).phaseRandSec = theShifts(params.thePhaseIndices(j));
     end
     % The following section is commented out; this will need to be
