@@ -23,7 +23,7 @@ PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, 
 params = PupilAnalysisToolbox_GetDefaultParams
 params.StepDurSecs = 5;
 
-Subjects = {'J012216R'};
+Subjects = {'J012216R' 'G012216A'};
 Protocols={'MelanopsinStepsFovealControlShortDuration5_5sPulse'};
 
 basePath = '/Users/pupillab/Dropbox (Aguirre-Brainard Lab)/MELA_data/MelanopsinStepsFovealControlShortDuration5_5sPulse';
