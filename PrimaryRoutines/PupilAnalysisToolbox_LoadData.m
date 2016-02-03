@@ -1,4 +1,4 @@
-function [Data,TrialFrequencies,TrialPhases,TrialDirections,timeStepStim,DateTime] = PupilAnalysisToolbox_LoadData(basePath, Protocol,Subject,Session)
+function [Data,TrialFrequencies,TrialPhases,TrialDirections,TrialContrasts,timeStepStim,DateTime] = PupilAnalysisToolbox_LoadData(basePath, Protocol,Subject,Session)
 
 % Extract the data path directly from this file.
 
@@ -11,19 +11,14 @@ function [Data,TrialFrequencies,TrialPhases,TrialDirections,timeStepStim,DateTim
 % consider every contrast level as a separate direction. We do that by
 % reassigned the direction labels in 'TrialDirections', that way the
 % different contrast levels will be handled separately.
-%    if isfield(Data, 'contrastRelMax')
-%    for x = 1:length(Data)
-%       TrialDirections{x} = [TrialDirections{x} num2str(Data(x).contrastRelMax*maxContrast*100, '%02d')];
-%    end
+
 % GKA - 8-20-2014
 %***************
 
 %dataDirStem = ['/Users/Shared/Matlab/experiments/OneLight/OLPupilDiameter/data/'];
-dataDirStem = '/Users/Shared/Matlab/Experiments/OneLight/OLFlickerSensitivity/data';
 
 dataDir = fullfile(basePath, Subject);
 inputFile = [Subject '-' Protocol '-' num2str(Session) '.mat'];
-
 
 if (exist(fullfile(dataDir, inputFile),'file')==2)
     
@@ -46,7 +41,11 @@ if (exist(fullfile(dataDir, inputFile),'file')==2)
     end % Assemble a string array of modulation direction cache file names
     
     TrialPhases = [Data.phaseCarrier];
-    
+    if ~isempty(strfind(Protocol, 'CRF'));
+        TrialContrasts = [Data.contrastRelMax];
+    else
+        TrialContrasts = [];
+    end
     
     % This statemenent detects if the field "modulationMode" exists
     % This detection is needed as some of the older data does not
@@ -118,6 +117,7 @@ else % File does not exist; return nulls
     TrialPhases=[];
     TrialDirections=[];
     timeStepStim=[];
+    TrialContrasts = [];
     DateTime = '';
 end
 

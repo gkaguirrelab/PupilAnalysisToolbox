@@ -44,7 +44,7 @@ for SubjectID=1:length(Subjects)
     for sess=1:3
         for p=1:length(Protocols)
             % Load data set
-            [TempData,TempTrialFrequencies,TempTrialPhases,TempTrialDirections,TempAlphaSpacing,TempDateTime]=...
+            [TempData,TempTrialFrequencies,TempTrialPhases,TempTrialDirections,TempTrialContrasts,TempAlphaSpacing,TempDateTime]=...
                 PupilAnalysisToolbox_LoadData(basePath, char(Protocols(p)),char(Subjects(SubjectID)),sess);
             
             if (not(isempty(TempData)))
@@ -57,8 +57,8 @@ for SubjectID=1:length(Subjects)
                 % adaptation to the background.
                 BackgroundAdaptData(sess,p)=TempData(1);
                 
-                TempData(1)=[]; TempTrialFrequencies(1)=[]; TempTrialDirections(1)=[]; TempTrialPhases(1)=[];
-                TempData(2)=[]; TempTrialFrequencies(2)=[]; TempTrialDirections(2)=[]; TempTrialPhases(2)=[];
+                TempData(1)=[]; TempTrialFrequencies(1)=[]; TempTrialDirections(1)=[]; TempTrialPhases(1)=[]; TempTrialContrasts(1) = [];
+                TempData(2)=[]; TempTrialFrequencies(2)=[]; TempTrialDirections(2)=[]; TempTrialPhases(2)=[]; TempTrialContrasts(2) = [];
                 
                 % Now remove those trials that have insufficient time points
                 NumTrials = length(TempData);
@@ -69,6 +69,7 @@ for SubjectID=1:length(Subjects)
                         TempTrialFrequencies(trial) = [];
                         TempTrialDirections(trial) = [];
                         TempTrialPhases(trial) = [];
+                        TempTrialContrasts(trial) = [];
                         NumTrials = NumTrials-1;
                     else trial = trial+1;
                     end
@@ -80,6 +81,7 @@ for SubjectID=1:length(Subjects)
                     TrialFrequencies = TempTrialFrequencies;
                     TrialDirections = TempTrialDirections;
                     TrialPhases = TempTrialPhases;
+                    TrialContrasts = TempTrialContrasts;
                     FirstGoodSessionFlag=0;
                 else
                     Data(end+1:end+length(TempData)) = TempData(1:end);
@@ -89,6 +91,8 @@ for SubjectID=1:length(Subjects)
                         TempTrialDirections(1:end);
                     TrialPhases(end+1:end+length(TempTrialPhases))=...
                         TempTrialPhases(1:end);
+                    TrialContrasts(end+1:end+length(TempTrialContrasts))=...
+                        TempTrialContrasts(1:end);
                 end
             end % if file exists
         end % loop over directions
@@ -188,6 +192,14 @@ for SubjectID=1:length(Subjects)
     fprintf('done.'); % notify user we are done the loop
     fprintf(['\n\t*** Found ' num2str(trialCounter-1) ' good trials.']);
     
+    %% Add the contrast information
+    if ~isempty(strfind(Protocols{1}, 'CRF'))
+        for d = 1:length(TrialDirections)
+            tmp0 = allwords(TrialDirections{d}, '-');
+            TrialDirections{d} = [tmp0{1} '-' tmp0{2} num2str(abs(TrialContrasts(d))*0.42*100, '%.0f') 'Pct-' tmp0{3} '-' tmp0{4}];
+        end
+    end
+    
     % Allocate variables to hold results
     % Create an average time-series for each unique frequency and direction
     % crossing. Calculate for these the best fit, amplitude and phase.
@@ -216,7 +228,9 @@ for SubjectID=1:length(Subjects)
     GaussModel=gausswin(params.full_trial_length*params.sampling_frequency,Alpha);
     
     GaussModel=fshift(GaussModel,round(params.full_trial_length*params.sampling_frequency/4));
-    mkdir(fullfile(resultsPath, char(Subjects(SubjectID))));
+    if ~exist(fullfile(resultsPath, char(Subjects(SubjectID))), 'dir');
+        mkdir(fullfile(resultsPath, char(Subjects(SubjectID))));
+    end
     cd(fullfile(resultsPath, char(Subjects(SubjectID))));
     fprintf(['\n\t*** Averaging ' num2str(length(UniqueFreqs)*length(UniqueDirections)) ' crossings of frequency and direction: ']); % Update user
     
