@@ -29,7 +29,7 @@ p.addOptional('full_trial_length', 45, @isscalar); % The length in seconds of th
 p.addOptional('final_trial_length', 40, @isscalar); % The length of each data trial after processing,
 % taken from the tail of each full data trial.
 % That is, we discard some data from the start of each trial.
-p.addOptional('minimum_length_trial', 42, @isscalar); % Any trial shorter than this will be discarded
+p.addOptional('minimum_length_trial', 35, @isscalar); % Any trial shorter than this will be discarded
 p.addOptional('spike_remover_params', [15 0.5 4], @isscalar); % 3-element vector with the following elements:
 % 1- The window size to use for spike removal
 % 2- The max acceptable proportion change in the window

@@ -1,4 +1,4 @@
-function PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath)
+function [UniqueDirectionLabels, AvgTimeSeries, SEMTimeSeries, MeanMatrix, TimeSeriesMatrixStore] = PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath)
 % PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -270,6 +270,9 @@ for SubjectID=1:length(Subjects)
                     TimeSeriesMatrixOrig(removePoints, m) = NaN;
                 end
                 
+                %% Remove points beyond what is in minimum_length_trial
+                TimeSeriesMatrixOrig = TimeSeriesMatrixOrig(1:params.sampling_frequency*params.minimum_length_trial, :);
+                
                 % Make sure we're within the bounds for rejecting an entire
                 % trial
                 totalN = size(TimeSeriesMatrixOrig, 2);
@@ -296,8 +299,8 @@ for SubjectID=1:length(Subjects)
             end
             
             MeanMatrix{f,d,:} = theMean;
-            AvgTimeSeries(f,d,:)=nanmean(TimeSeriesMatrix,2);
-            SEMTimeSeries(f,d,:)=nanstd(TimeSeriesMatrix, [], 2)/sqrt(size(TimeSeriesMatrix,2 ));
+            AvgTimeSeries(f,d,:) = nanmean(TimeSeriesMatrix,2);
+            SEMTimeSeries(f,d,:) = nanstd(TimeSeriesMatrix, [], 2)/sqrt(size(TimeSeriesMatrix,2 ));
             TimeSeriesMatrixStore{f, d} = TimeSeriesMatrix;
             if isempty(strfind(UniqueDirectionLabels{d}, 'Background'));
                 if params.SaveDataFlag
