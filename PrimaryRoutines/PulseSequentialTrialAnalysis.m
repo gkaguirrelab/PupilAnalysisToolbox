@@ -283,7 +283,7 @@ for SubjectID=1:length(Subjects)
         shadedErrorBar(timeVector(1:600), squeeze(AvgTimeSeries(:, d, 1:600)), squeeze(SEMTimeSeries(:, d, 1:600)));
         plot([timeVector(1) timeVector(600)], [0 0]', '-', 'Color', [0.2 0.2 0.2]);
         pbaspect([1 1 1]);
-        title({strrep(UniqueDirectionLabels{d}, '_', ' ') char(Subjects(SubjectID))});
+        title({strrep(UniqueDirectionLabels{d}, '_', ' ') strrep(char(Subjects(SubjectID)), '_', ' ')});
         plot([5 5], [-0.4 0.4], 'r');
         ylim([-0.4 0.4]);
         M = [timeVector(1:600)' squeeze(AvgTimeSeries(:, d, 1:600))];
