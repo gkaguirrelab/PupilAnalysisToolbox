@@ -19,7 +19,7 @@ PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, 
 %% MelanopsinStepsFovealControlShortDuration5_5sPulse
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 params = PupilAnalysisToolbox_GetDefaultParams;
-params.StepDurSecs = 5;
+params.StepDurSecs = 5.5;
 
 Subjects = {'M012216S' 'J012216R' 'G012216A'};
 Protocols={'MelanopsinStepsFovealControlShortDuration5_5sPulse'};
@@ -34,10 +34,10 @@ PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% MelanopsinStepsFovealControlShortDuration5_5sPulse
+%% Mel5_5sPulseFoveal
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 params = PupilAnalysisToolbox_GetDefaultParams;
-params.StepDurSecs = 5;
+params.StepDurSecs = 5.5;
 
 Subjects = {'J012216R_foveal'};
 Protocols={'Mel5_5sPulseFoveal'};

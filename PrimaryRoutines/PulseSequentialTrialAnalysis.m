@@ -4,6 +4,7 @@ function PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, ol
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MAIN ROUTINE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+currDir = pwd;
 
 % Loop across subjects and perform the analysis
 for SubjectID=1:length(Subjects)
@@ -26,6 +27,7 @@ for SubjectID=1:length(Subjects)
     clear TimeSeriesMatrix;
     clear theValid;
     clear theMeanMatrix;
+    clear invalid;
     
     % Prepare plot figures for this subject
     if (params.TrialInspectorFlag==1)
@@ -232,15 +234,11 @@ for SubjectID=1:length(Subjects)
         mkdir(fullfile(resultsPath, char(Subjects(SubjectID))));
     end
     cd(fullfile(resultsPath, char(Subjects(SubjectID))));
-    fprintf(['\n\t*** Averaging ' num2str(length(UniqueFreqs)*length(UniqueDirections)) ' crossings of frequency and direction: ']); % Update user
+    fprintf(['\n\t*** Averaging ' num2str(length(UniqueFreqs)*length(UniqueDirections)) ' crossings of frequency and direction.']); % Update user
     
     for f=1:length(UniqueFreqs)
         for d=1:length(UniqueDirections)
             IterationCount=(f-1)*length(UniqueDirections) + d;
-            for j=0:log10(IterationCount-1)
-                fprintf('\b'); % delete previous counter display
-            end
-            fprintf('%d', IterationCount); % update progress dots
             Indices = find(and((TrialFrequencies==UniqueFreqs(f)),strcmp(TrialDirections,UniqueDirections(d))));
             if (not(isempty(Indices)))
                 % Create the average time series. This is done by first
@@ -248,28 +246,47 @@ for SubjectID=1:length(Subjects)
                 %  the nanmean to handle NaN points
                 for i=1:length(Indices)
                     if (i==1)
-                        TimeSeriesMatrix=[TimeSeries(Indices(i),:)'];
+                        TimeSeriesMatrixOrig=[TimeSeries(Indices(i),:)'];
                     else
-                        TimeSeriesMatrix=[TimeSeriesMatrix TimeSeries(Indices(i),:)'];
+                        TimeSeriesMatrixOrig=[TimeSeriesMatrixOrig TimeSeries(Indices(i),:)'];
                     end % if the first timeseries
                 end % for number of indicies
-                theMean = mean(TimeSeriesMatrix(1:100, :));
+                theMean = mean(TimeSeriesMatrixOrig(1:100, :));
                 theMeanMatrix(Indices) = theMean;
-                TimeSeriesMatrix = ((TimeSeriesMatrix-repmat(theMean, size(TimeSeriesMatrix, 1), 1))./repmat(theMean, size(TimeSeriesMatrix, 1), 1));
-                theRemoveIdx = find(sum(abs(TimeSeriesMatrix) > 0.5));
-                theRemoveIdxReverse = find(~(sum(abs(TimeSeriesMatrix) > 0.5)));
-                TimeSeriesMatrix(:, theRemoveIdx) = [];
-                theMean(:, theRemoveIdx) = [];
-                theValid(Indices(theRemoveIdxReverse)) = 1;
+                TimeSeriesMatrix = ((TimeSeriesMatrixOrig-repmat(theMean, size(TimeSeriesMatrixOrig, 1), 1))./repmat(theMean, size(TimeSeriesMatrixOrig, 1), 1));
                 for m = 1:size(TimeSeriesMatrix, 2)
                     iy = TimeSeriesMatrix(:, m);
-                    [iy, indx]=SpikeRemover(iy,params.spike_remover_params);
+                    [iy, indx] = SpikeRemover(iy,params.spike_remover_params);
                     
-                    removePoints = find(abs(iy)>params.BadPercentChangeThreshold);
-                    iy(removePoints)=NaN;
+                    removePoints = find(abs(iy) > params.BadPercentChangeThreshold);
+                    iy(removePoints) = NaN;
                     TimeSeriesMatrix(:, m) = iy;
+                    TimeSeriesMatrixOrig(indx, m) = NaN;
+                    TimeSeriesMatrixOrig(removePoints, m) = NaN;
                 end
+                
+                % Make sure we're within the bounds for rejecting an entire
+                % trial
+                totalN = size(TimeSeriesMatrixOrig, 2);
+                rejectN = 0;
+                for m = 1:size(TimeSeriesMatrixOrig, 2)
+                   if sum(isnan(TimeSeriesMatrixOrig(:, m)))/length(TimeSeriesMatrixOrig(:, m)) > params.BadNaNThreshold;
+                       invalid(m) = 1;
+                       rejectN = rejectN+1;
+                   else
+                       invalid(m) = 0;
+                   end
+                end
+                invalid = logical(invalid);
+                TimeSeriesMatrixOrig(:, invalid) = [];
+                
+                fprintf('\n\t-> %s: rejecting %g of %g (%.2f)', UniqueDirectionLabels{d}, rejectN, totalN, 100*(rejectN/totalN));
+                % Now, with the blinks etc. removed, do normalize by mean
+                % again
+                theMean = mean(TimeSeriesMatrixOrig(1:100, :));
+                TimeSeriesMatrix = ((TimeSeriesMatrixOrig-repmat(theMean, size(TimeSeriesMatrixOrig, 1), 1))./repmat(theMean, size(TimeSeriesMatrixOrig, 1), 1));
             end
+            
             MeanMatrix{f,d,:} = theMean;
             AvgTimeSeries(f,d,:)=nanmean(TimeSeriesMatrix,2);
             SEMTimeSeries(f,d,:)=nanstd(TimeSeriesMatrix, [], 2)/sqrt(size(TimeSeriesMatrix,2 ));
@@ -281,10 +298,6 @@ for SubjectID=1:length(Subjects)
             end
         end % if indices is not length zero
     end % for number of unique directions
-    for j=0:log10(IterationCount-1)
-        fprintf('\b'); % delete previous counter display
-    end
-    fprintf('done.'); % notify user we are done the loop
     
     timeVector = 0:1/params.sampling_frequency:params.final_trial_length-1/params.sampling_frequency;
     
@@ -294,13 +307,13 @@ for SubjectID=1:length(Subjects)
         hold on;
         %plot(timeVector(1:400), squeeze(AvgTimeSeries(:, d, 1:400)), '-k');
         plot([5+params.StepDurSecs 5+params.StepDurSecs], [-0.4 0.4], 'r'); hold on;
-        shadedErrorBar(timeVector(1:600), squeeze(AvgTimeSeries(:, d, 1:600)), squeeze(SEMTimeSeries(:, d, 1:600)));
-        plot([timeVector(1) timeVector(600)], [0 0]', '-', 'Color', [0.2 0.2 0.2]);
+        shadedErrorBar(timeVector(1:500), squeeze(AvgTimeSeries(:, d, 1:500)), squeeze(SEMTimeSeries(:, d, 1:500)));
+        plot([timeVector(1) timeVector(500)], [0 0]', '-', 'Color', [0.2 0.2 0.2]);
         pbaspect([1 1 1]);
         title({strrep(UniqueDirectionLabels{d}, '_', ' ') strrep(char(Subjects(SubjectID)), '_', ' ')});
         plot([5 5], [-0.4 0.4], 'r');
         ylim([-0.4 0.4]);
-        M = [timeVector(1:600)' squeeze(AvgTimeSeries(:, d, 1:600))];
+        M = [timeVector(1:500)' squeeze(AvgTimeSeries(:, d, 1:500))];
         if params.SaveDataFlag
             % Save out mean pupil size
             csvwrite([char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '.csv'], M);
@@ -317,3 +330,5 @@ for SubjectID=1:length(Subjects)
     end
     fprintf('\n');
 end % main
+
+cd(currDir);

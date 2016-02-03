@@ -30,16 +30,16 @@ p.addOptional('final_trial_length', 40, @isscalar); % The length of each data tr
 % taken from the tail of each full data trial.
 % That is, we discard some data from the start of each trial.
 p.addOptional('minimum_length_trial', 42, @isscalar); % Any trial shorter than this will be discarded
-p.addOptional('spike_remover_params', [10 0.5 4], @isscalar); % 3-element vector with the following elements:
+p.addOptional('spike_remover_params', [15 0.5 4], @isscalar); % 3-element vector with the following elements:
 % 1- The window size to use for spike removal
 % 2- The max acceptable proportion change in the window
 % 3- The max acceptable change in SD units in the window
 
-p.addOptional('sgolay_span', 5, @isscalar); % Parameters of the SGolay interpolation prior to interpolation
-p.addOptional('sgolay_polynomial', 4, @isscalar);
-p.addOptional('BadPercentChangeThreshold', 0.4, @isscalar); % Any time point with an absolute change from
+p.addOptional('sgolay_span', 20, @isscalar); % Parameters of the SGolay interpolation prior to interpolation
+p.addOptional('sgolay_polynomial', 7, @isscalar);
+p.addOptional('BadPercentChangeThreshold', 0.5, @isscalar); % Any time point with an absolute change from
 % the mean of greater than this proportion will be NaN-ed, as it is certainly noise
-p.addOptional('BadNanThreshold', 0.1, @isscalar); % If more than this proportion
+p.addOptional('BadNaNThreshold', 0.1, @isscalar); % If more than this proportion
 % of a trial time series is composed of NaNs, discard the trial
 
 % Extract and assign the inputs

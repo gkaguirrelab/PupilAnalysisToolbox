@@ -41,12 +41,8 @@ if (exist(fullfile(dataDir, inputFile),'file')==2)
     end % Assemble a string array of modulation direction cache file names
     
     TrialPhases = [Data.phaseCarrier];
-    if ~isempty(strfind(Protocol, 'CRF'));
-        TrialContrasts = [Data.contrastRelMax];
-    else
-        TrialContrasts = [];
-    end
-    
+    TrialContrasts = [Data.contrastRelMax];
+
     % This statemenent detects if the field "modulationMode" exists
     % This detection is needed as some of the older data does not
     % have this field defined
