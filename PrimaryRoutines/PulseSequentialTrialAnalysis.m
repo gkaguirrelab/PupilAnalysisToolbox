@@ -198,7 +198,7 @@ for SubjectID=1:length(Subjects)
     % Clean up the direction labels
     for d = 1:length(UniqueDirections)
         tmp0 = allwords(UniqueDirections{d}, '-');
-        UniqueDirectionLabels{d} = tmp0{2};
+        UniqueDirectionLabels{d} = [tmp0{2} '-' tmp0{3}];
     end
     
     if (params.RelabelDirections==1)
@@ -283,7 +283,7 @@ for SubjectID=1:length(Subjects)
         shadedErrorBar(timeVector(1:600), squeeze(AvgTimeSeries(:, d, 1:600)), squeeze(SEMTimeSeries(:, d, 1:600)));
         plot([timeVector(1) timeVector(600)], [0 0]', '-', 'Color', [0.2 0.2 0.2]);
         pbaspect([1 1 1]);
-        title(strrep(UniqueDirectionLabels{d}, '_', ' '));
+        title({strrep(UniqueDirectionLabels{d}, '_', ' ') char(Subjects(SubjectID))});
         plot([5 5], [-0.4 0.4], 'r');
         ylim([-0.4 0.4]);
         M = [timeVector(1:600)' squeeze(AvgTimeSeries(:, d, 1:600))];
