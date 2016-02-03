@@ -1,9 +1,14 @@
 function [cleaned, indx] = SpikeRemover(data,spike_remover_params)
-
-% This routine is pretty bone-headed. It sets to Nan any stretch of WINDOW
+% [cleaned, indx] = SpikeRemover(data,spike_remover_params)
+%
+% This routine takes in three arguments in remover_params:
+%   1- The window size to use for spike removal
+%   2- The max acceptable proportion change in the window
+%   3- The max acceptable change in SD units in the window
+% This routine is pretty bone-headed. It sets to NaN any stretch of WINDOW
 % measures from the data within which the data contains a max and min that
-% are more than a 20% signal change or 3 SD of the entire time series.
-% The WINDOW before and after are also set to NAN
+% are more than a X% signal change or Y SD of the entire time series.
+% The WINDOW before and after are also set to NaN
 
 window = spike_remover_params(1); % the size of the window to sweep
 spike_thresh_percen = spike_remover_params(2); % Remove points of greater than X% change

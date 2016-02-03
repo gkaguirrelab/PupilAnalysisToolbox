@@ -1,3 +1,6 @@
+[~, userID] = system('whoami');
+userID = strtrim(userID);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MelanopsinStepsFovealControlShortDuration1_5sPulse
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -24,8 +27,8 @@ params.StepDurSecs = 5.5;
 Subjects = {'M012216S' 'J012216R' 'G012216A'};
 Protocols={'MelanopsinStepsFovealControlShortDuration5_5sPulse'};
 
-basePath = '/Users/pupillab/Dropbox (Aguirre-Brainard Lab)/MELA_data/MelanopsinStepsFovealControlShortDuration5_5sPulse';
-resultsPath = '/Users/pupillab/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/MelanopsinStepsFovealControlShortDuration5_5sPulse';
+basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/MelanopsinStepsFovealControlShortDuration5_5sPulse'];
+resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/MelanopsinStepsFovealControlShortDuration5_5sPulse'];
 
 newLabels = {'Background', 'LMS+', 'Mel+', 'Cone noise'};
 oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse5_5sConeNoise', 'MelanopsinDirectedPenumbralIgnoreNulled-45sPositivePulse5_5sConeNoise', 'ConeNoiseOnly-45s'};

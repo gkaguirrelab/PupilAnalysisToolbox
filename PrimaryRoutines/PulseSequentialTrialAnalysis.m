@@ -236,8 +236,13 @@ for SubjectID=1:length(Subjects)
     cd(fullfile(resultsPath, char(Subjects(SubjectID))));
     fprintf(['\n\t*** Averaging ' num2str(length(UniqueFreqs)*length(UniqueDirections)) ' crossings of frequency and direction.']); % Update user
     
+    outfile = [char(Subjects(SubjectID)) '_PupilPulseData_DataQuality.csv'];
+    fid = fopen(outfile, 'w');
+    fprintf(fid, 'Direction,Rejected trials,Total trials,Percentage rejected\n');
     for f=1:length(UniqueFreqs)
         for d=1:length(UniqueDirections)
+            
+            %
             IterationCount=(f-1)*length(UniqueDirections) + d;
             Indices = find(and((TrialFrequencies==UniqueFreqs(f)),strcmp(TrialDirections,UniqueDirections(d))));
             if (not(isempty(Indices)))
@@ -270,15 +275,18 @@ for SubjectID=1:length(Subjects)
                 totalN = size(TimeSeriesMatrixOrig, 2);
                 rejectN = 0;
                 for m = 1:size(TimeSeriesMatrixOrig, 2)
-                   if sum(isnan(TimeSeriesMatrixOrig(:, m)))/length(TimeSeriesMatrixOrig(:, m)) > params.BadNaNThreshold;
-                       invalid(m) = 1;
-                       rejectN = rejectN+1;
-                   else
-                       invalid(m) = 0;
-                   end
+                    if sum(isnan(TimeSeriesMatrixOrig(:, m)))/length(TimeSeriesMatrixOrig(:, m)) > params.BadNaNThreshold;
+                        invalid(m) = 1;
+                        rejectN = rejectN+1;
+                    else
+                        invalid(m) = 0;
+                    end
                 end
                 invalid = logical(invalid);
                 TimeSeriesMatrixOrig(:, invalid) = [];
+                % Save the data quality information
+                fprintf(fid, '%s,%g,%g,%.2f\n', UniqueDirectionLabels{d}, rejectN, totalN, 100*(rejectN/totalN));
+                
                 
                 fprintf('\n\t-> %s: rejecting %g of %g (%.2f)', UniqueDirectionLabels{d}, rejectN, totalN, 100*(rejectN/totalN));
                 % Now, with the blinks etc. removed, do normalize by mean
@@ -298,6 +306,7 @@ for SubjectID=1:length(Subjects)
             end
         end % if indices is not length zero
     end % for number of unique directions
+    fclose(fid);
     
     timeVector = 0:1/params.sampling_frequency:params.final_trial_length-1/params.sampling_frequency;
     
