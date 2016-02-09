@@ -15,7 +15,8 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'Mel_-09pct', 'Mel_-18pct', 'Mel_-36pct'};
 oldLabels = {'MelanopsinDirectedPenumbralIgnoreNulled9Pct-45sNegativePulse5sConeNoiseCRF' 'MelanopsinDirectedPenumbralIgnoreNulled18Pct-45sNegativePulse5sConeNoiseCRF' 'MelanopsinDirectedPenumbralIgnoreNulled36Pct-45sNegativePulse5sConeNoiseCRF'};    
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MelLightLevelDependence5sMelanopsinDirectedPenumbralIgnorePositivePulseConeNoiseCRF_ND10
@@ -31,7 +32,8 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'Mel_+09pct', 'Mel_+18pct', 'Mel_+36pct'};
 oldLabels = {'MelanopsinDirectedPenumbralIgnoreNulled9Pct-45sPositivePulse5sConeNoiseCRF' 'MelanopsinDirectedPenumbralIgnoreNulled18Pct-45sPositivePulse5sConeNoiseCRF' 'MelanopsinDirectedPenumbralIgnoreNulled36Pct-45sPositivePulse5sConeNoiseCRF'};    
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MelLightLevelDependence5sLMSDirectedNegativePulseConeNoiseCRF_ND10
@@ -47,7 +49,8 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'LMS_-09pct', 'LMS_-18pct', 'LMS_-36pct'};
 oldLabels = {'LMSDirectedNulled9Pct-45sNegativePulse5sConeNoiseCRF' 'LMSDirectedNulled18Pct-45sNegativePulse5sConeNoiseCRF' 'LMSDirectedNulled36Pct-45sNegativePulse5sConeNoiseCRF'};    
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MelLightLevelDependence5sLMSDirectedPositivePulseConeNoiseCRF_ND10
@@ -63,5 +66,5 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'LMS_+09pct', 'LMS_+18pct', 'LMS_+36pct'};
 oldLabels = {'LMSDirectedNulled9Pct-45sPositivePulse5sConeNoiseCRF' 'LMSDirectedNulled18Pct-45sPositivePulse5sConeNoiseCRF' 'LMSDirectedNulled36Pct-45sPositivePulse5sConeNoiseCRF'};    
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
-
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);

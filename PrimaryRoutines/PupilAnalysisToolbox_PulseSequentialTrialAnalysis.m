@@ -1,4 +1,4 @@
-function [UniqueDirectionLabels, AvgTimeSeries, SEMTimeSeries, MeanMatrix, TimeSeriesMatrixStore] = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath)
+function ReturnData = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath)
 % PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -235,6 +235,9 @@ for SubjectID=1:length(Subjects)
     end
     cd(fullfile(resultsPath, char(Subjects(SubjectID))));
     fprintf(['\n\t*** Averaging ' num2str(length(UniqueFreqs)*length(UniqueDirections)) ' crossings of frequency and direction.']); % Update user
+    dd = 0;
+        
+    timeVector = 0:1/params.sampling_frequency:params.final_trial_length-1/params.sampling_frequency;
     
     outfile = [char(Subjects(SubjectID)) '_PupilPulseData_DataQuality.csv'];
     fid = fopen(outfile, 'w');
@@ -246,6 +249,7 @@ for SubjectID=1:length(Subjects)
             IterationCount=(f-1)*length(UniqueDirections) + d;
             Indices = find(and((TrialFrequencies==UniqueFreqs(f)),strcmp(TrialDirections,UniqueDirections(d))));
             if isempty(strfind(UniqueDirections{d}, 'Background')) % Only do this for non-background data
+                dd = dd+1;
                 if (not(isempty(Indices)))
                     % Create the average time series. This is done by first
                     %  assembling a matrix across time-series, and then using
@@ -395,6 +399,15 @@ for SubjectID=1:length(Subjects)
                 AvgTimeSeries(f,d,:) = nanmean(TimeSeriesMatrix,2);
                 SEMTimeSeries(f,d,:) = nanstd(TimeSeriesMatrix, [], 2)/sqrt(size(TimeSeriesMatrix,2 ));
                 TimeSeriesMatrixStore{f, d} = TimeSeriesMatrix;
+                
+                ReturnData(SubjectID, dd).label = UniqueDirectionLabels{d};
+                ReturnData(SubjectID, dd).t = timeVector(1:length(AvgTimeSeries));
+                ReturnData(SubjectID, dd).Mean = theMean;
+                ReturnData(SubjectID, dd).TimeSeries = TimeSeriesMatrix;
+                ReturnData(SubjectID, dd).AvgTimeSeries = nanmean(TimeSeriesMatrix,2);
+                ReturnData(SubjectID, dd).SEMTimeSeries = nanstd(TimeSeriesMatrix, [], 2)/sqrt(size(TimeSeriesMatrix,2 ));
+                
+                
                 if isempty(strfind(UniqueDirectionLabels{d}, 'Background'));
                     if params.SaveDataFlag
                         csvwrite([char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '_TimeSeries.csv'], TimeSeriesMatrix);
@@ -407,8 +420,7 @@ for SubjectID=1:length(Subjects)
         
     end % for number of unique directions
     fclose(fid);
-    
-    timeVector = 0:1/params.sampling_frequency:params.final_trial_length-1/params.sampling_frequency;
+
     
     % Plot the time series
     for d=1:length(UniqueDirections)

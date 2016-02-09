@@ -17,7 +17,8 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'Background', 'LMS+', 'Mel+',};
 oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse5s', 'MelanopsinDirectedPenumbralIgnoreNulled-45sPositivePulse5s'};
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,7 +37,8 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'Background', 'LMS+', 'Mel+',};
 oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse5s', 'MelanopsinDirectedPenumbralIgnoreNulled-45sPositivePulse5s'};
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -56,7 +58,8 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'Background', 'LMS+', 'Mel+',};
 oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse5s', 'MelanopsinDirectedPenumbralIgnoreNulled-45sPositivePulse5s'};
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,7 +78,8 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'Background', 'LMS+', 'Mel+',};
 oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse5s', 'MelanopsinDirectedPenumbralIgnoreNulled-45sPositivePulse5s'};
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,7 +98,8 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'Background', 'LMS+', 'Mel+',};
 oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse5s', 'MelanopsinDirectedPenumbralIgnoreNulled-45sPositivePulse5s'};
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -113,7 +118,8 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'Background', 'LMS+', 'LMS-', 'Mel+', 'Mel-'};
 oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse5s', 'LMSDirectedNulled-45sNegativePulse5s', 'MelanopsinDirectedPenumbralIgnoreNulled-45sPositivePulse5s', 'MelanopsinDirectedPenumbralIgnoreNulled-45sNegativePulse5s'};
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -132,7 +138,8 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'Background', 'LMS+', 'LMS-', 'Mel+', 'Mel-'};
 oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse5s', 'LMSDirectedNulled-45sNegativePulse5s', 'MelanopsinDirectedPenumbralIgnoreNulled-45sPositivePulse5s', 'MelanopsinDirectedPenumbralIgnoreNulled-45sNegativePulse5s'};
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -151,4 +158,5 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 
 newLabels = {'Background', 'LMS+', 'LMS-', 'Mel+', 'Mel-'};
 oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse5sConeNoise', 'LMSDirectedNulled-45sNegativePulse5sConeNoise', 'MelanopsinDirectedPenumbralIgnoreNulled-45sPositivePulse5sConeNoise', 'MelanopsinDirectedPenumbralIgnoreNulled-45sNegativePulse5sConeNoise'};
-PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
