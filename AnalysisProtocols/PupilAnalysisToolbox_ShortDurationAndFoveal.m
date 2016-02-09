@@ -35,7 +35,6 @@ oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse5_5sConeNoise'
 Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
 PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Mel5_5sPulseFoveal
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
