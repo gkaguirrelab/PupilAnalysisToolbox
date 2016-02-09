@@ -166,13 +166,13 @@ for SubjectID=1:length(Subjects)
         TimeSeries(trial, :) = tmp;
         % Store the mean pupil size.
         
-        if (params.TrialInspectorFlag==1)
-            figure(figTrialInspector);
-            plot(iy,'k');
-            hold off;
-            fprintf(['trial: ' int2str(trial) ' ' num2str(TrialFrequencies(trial)) ' ' char(TrialDirections(trial)) ' ' num2str(TrialPhases(trial))]);
-            pause;
-        end
+        %if (params.TrialInspectorFlag==1)
+        %    figure(figTrialInspector);
+        %%    plot(iy,'k');
+         %   hold off;
+         %   fprintf(['trial: ' int2str(trial) ' ' num2str(TrialFrequencies(trial)) ' ' char(TrialDirections(trial)) ' ' num2str(TrialPhases(trial))]);
+         %   pause;
+        %e%\nd
         
     end
     
@@ -259,6 +259,7 @@ for SubjectID=1:length(Subjects)
                 theMean = mean(TimeSeriesMatrixOrig(1:100, :));
                 theMeanMatrix(Indices) = theMean;
                 TimeSeriesMatrix = ((TimeSeriesMatrixOrig-repmat(theMean, size(TimeSeriesMatrixOrig, 1), 1))./repmat(theMean, size(TimeSeriesMatrixOrig, 1), 1));
+                TimeSeriesMatrixOrigNonClean = TimeSeriesMatrixOrig;
                 for m = 1:size(TimeSeriesMatrix, 2)
                     iy = TimeSeriesMatrix(:, m);
                     [iy, indx] = SpikeRemover(iy,params.spike_remover_params);
@@ -268,6 +269,23 @@ for SubjectID=1:length(Subjects)
                     TimeSeriesMatrix(:, m) = iy;
                     TimeSeriesMatrixOrig(indx, m) = NaN;
                     TimeSeriesMatrixOrig(removePoints, m) = NaN;
+                    
+                    if params.TrialInspectorFlag
+                        figure(figTrialInspector);
+                        
+                        subplot(1, 2, 1);
+                        hold off;
+                        plot(TimeSeriesMatrixOrigNonClean(:, m), '-r');  hold on; 
+                        plot(TimeSeriesMatrixOrig(:, m), '-k');
+                        pbaspect([1 1 1]);
+                        
+                        subplot(1, 2, 2);
+                        hold off;
+                        plot(diff(TimeSeriesMatrixOrigNonClean(:, m)), '-r');  hold on; 
+                        pbaspect([1 1 1]);
+                        pause;
+                    end
+                    
                 end
                 
                 %% Remove points beyond what is in minimum_length_trial
@@ -285,6 +303,9 @@ for SubjectID=1:length(Subjects)
                         invalid(m) = 0;
                     end
                 end
+                
+                
+                
                 invalid = logical(invalid);
                 TimeSeriesMatrixOrig(:, invalid) = [];
                 % Save the data quality information

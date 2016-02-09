@@ -11,7 +11,7 @@ p = inputParser;
 p.addOptional('SaveDataFlag', true, @islogical); % If set, save data
 p.addOptional('SavePlotFlag', true, @islogical); % If set, save plots
 p.addOptional('RelabelDirections', true, @islogical); % If set, relabel directions
-p.addOptional('TrialInspectorFlag', false, @islogical); % If set, plot each time series
+p.addOptional('TrialInspectorFlag', true, @islogical); % If set, plot each time series
 p.addOptional('HarmonicModelFlag', true, @islogical); % If set, model in the sparkline plots the harmonic
 p.addOptional('HarmonicTestFlag', false, @islogical); % If set, generate all response plots assuming harmonic stimulation
 p.addOptional('StutterErrorFlag', false, @islogical); % If these are data from the initial TTF4D
@@ -30,8 +30,8 @@ p.addOptional('final_trial_length', 40, @isscalar); % The length of each data tr
 % taken from the tail of each full data trial.
 % That is, we discard some data from the start of each trial.
 p.addOptional('minimum_length_trial', 35, @isscalar); % Any trial shorter than this will be discarded
-p.addOptional('spike_remover_params', [15 0.5 4], @isscalar); % 3-element vector with the following elements:
-% 1- The window size to use for spike removal
+p.addOptional('spike_remover_params', [8 0.5 3], @isscalar); % 3-element vector with the following elements:
+% 1- The window size [in samples] to use for spike removal
 % 2- The max acceptable proportion change in the window
 % 3- The max acceptable change in SD units in the window
 

@@ -30,7 +30,12 @@ for q = start_spot:end_spot
         indx = [indx q-floor(window*1.5):q+floor(window*1.5)];
     end % if statement for SD change
     
-    
+   % 1) what's and where the min value in time series
+   % 2) what's the max value before the point, and after the point
+   % 3) calculate diff between each max and min
+   % 4) take smaller of the two diffs
+   % 5) is that difference greater than the threshold?
+   % 6) code: flag ? bidirectional vs. unidirectional
     
 end % move window through data
 
