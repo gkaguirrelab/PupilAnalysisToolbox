@@ -421,20 +421,20 @@ for SubjectID=1:length(Subjects)
     end % for number of unique directions
     fclose(fid);
 
-    
+    yLim = params.yLim;
     % Plot the time series
     for d=1:length(UniqueDirections)
         if isempty(strfind(UniqueDirections{d}, 'Background')) % Only do this for non-background data
             figure;
             hold on;
             %plot(timeVector(1:400), squeeze(AvgTimeSeries(:, d, 1:400)), '-k');
-            plot([5+params.StepDurSecs 5+params.StepDurSecs], 100*[-0.4 0.4], 'r'); hold on;
+            plot([5+params.StepDurSecs 5+params.StepDurSecs], 100*[-yLim yLim], 'r'); hold on;
             shadedErrorBar(timeVector(1:500), 100*squeeze(AvgTimeSeries(:, d, 1:500)), 100*squeeze(SEMTimeSeries(:, d, 1:500)));
             plot([timeVector(1) timeVector(500)], [0 0]', '-', 'Color', [0.2 0.2 0.2]);
             pbaspect([1 1 1]);
             title({strrep(UniqueDirectionLabels{d}, '_', ' ') strrep(char(Subjects(SubjectID)), '_', ' ')});
-            plot([5 5], 100*[-0.4 0.4], 'r');
-            ylim(100*[-0.4 0.4]);
+            plot([5 5], 100*[-yLim yLim], 'r');
+            ylim(100*[-yLim yLim]);
             M = [timeVector(1:500)' squeeze(AvgTimeSeries(:, d, 1:500))];
             xlabel('Time [s]');
             ylabel('\Delta%');

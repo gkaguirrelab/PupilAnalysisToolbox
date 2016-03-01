@@ -16,7 +16,7 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 newLabels = {'Background', 'LMS+', 'Mel+', 'Cone noise'};
 oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse1_5sConeNoise', 'MelanopsinDirectedPenumbralIgnoreNulled-45sPositivePulse1_5sConeNoise', 'ConeNoiseOnly-45s'};
 Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
-PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params.yLim);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%%%%%%%%%%%%%%%%%%%%%%%
 %% MelanopsinStepsFovealControlShortDuration5_5sPulse
@@ -33,7 +33,7 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 newLabels = {'Background', 'LMS+', 'Mel+', 'Cone noise'};
 oldLabels = {'Background-60s', 'LMSDirectedNulled-45sPositivePulse5_5sConeNoise', 'MelanopsinDirectedPenumbralIgnoreNulled-45sPositivePulse5_5sConeNoise', 'ConeNoiseOnly-45s'};
 Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
-PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params.yLim);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Mel5_5sPulseFoveal
@@ -49,4 +49,4 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/M
 newLabels = {'Background', 'LMS+', 'Mel+', 'Cone noise'};
 oldLabels = {'Background-60s', 'LMSDirectedNulledFoveal-45sPositivePulse5_5sConeNoise', 'MelanopsinDirectedPenumbralIgnoreNulledFoveal-45sPositivePulse5_5sConeNoise', 'ConeNoiseOnly-45s'};
 Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
-PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params.yLim);
