@@ -41,7 +41,7 @@ PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath);
 params = PupilAnalysisToolbox_GetDefaultParams;
 params.StepDurSecs = 5.5;
 
-Subjects = {'J012216R_foveal'};
+Subjects = {'M012216S_foveal' 'J012216R_foveal' 'G012216A_foveal'};
 Protocols={'Mel5_5sPulseFoveal'};
 
 basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/Mel5_5sPulseFoveal'];
