@@ -248,7 +248,7 @@ for SubjectID=1:length(Subjects)
         for d=1:length(UniqueDirections)
             IterationCount=(f-1)*length(UniqueDirections) + d;
             Indices = find(and((TrialFrequencies==UniqueFreqs(f)),strcmp(TrialDirections,UniqueDirections(d))));
-            if isempty(strfind(UniqueDirections{d}, 'Background')) % Only do this for non-background data
+            if ~strcmp(UniqueDirections{d}, 'Background') % Only do this for non-background data
                 dd = dd+1;
                 if (not(isempty(Indices)))
                     % Create the average time series. This is done by first
@@ -424,7 +424,7 @@ for SubjectID=1:length(Subjects)
     yLim = params.yLim;
     % Plot the time series
     for d=1:length(UniqueDirections)
-        if isempty(strfind(UniqueDirections{d}, 'Background')) % Only do this for non-background data
+        if ~strcmp(UniqueDirections{d}, 'Background') % Only do this for non-background data
             figure;
             hold on;
             %plot(timeVector(1:400), squeeze(AvgTimeSeries(:, d, 1:400)), '-k');
@@ -449,6 +449,7 @@ for SubjectID=1:length(Subjects)
                 set(gcf, 'PaperPosition', [0 0 4 4]); %Position plot at left hand corner with width 15 and height 6.
                 set(gcf, 'PaperSize', [4 4]); %Set the paper to have width 15 and height 6.
                 saveas(gcf, [char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '.pdf'], 'pdf');
+                saveas(gcf, [char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '.png'], 'png');
                 close(gcf);
             end
         end
