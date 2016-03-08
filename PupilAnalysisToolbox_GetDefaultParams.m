@@ -45,11 +45,12 @@ p.addOptional('VelocitySmoothingParam', 5, @isscalar);
 
 p.addOptional('sgolay_span', 20, @isscalar); % Parameters of the SGolay interpolation prior to interpolation
 p.addOptional('sgolay_polynomial', 7, @isscalar);
-p.addOptional('BadPercentChangeThreshold', 0.5, @isscalar); % Any time point with an absolute change from
+p.addOptional('BadPercentChangeThreshold', 0.8, @isscalar); % Any time point with an absolute change from
 % the mean of greater than this proportion will be NaN-ed, as it is certainly noise
 p.addOptional('BadNaNThreshold', 0.1, @isscalar); % If more than this proportion
 % of a trial time series is composed of NaNs, discard the trial
 p.addOptional('yLim', 0.4, @isscalar); % Plotting range for y axis
+p.addOptional('xLim', 35, @isscalar); % Plotting range for y axis
 
 % Extract and assign the inputs
 p.parse(varargin{:});

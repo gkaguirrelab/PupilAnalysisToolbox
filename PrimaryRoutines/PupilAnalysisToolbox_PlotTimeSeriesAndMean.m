@@ -1,4 +1,4 @@
-function PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, yLimVal)
+function PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, xLimVal, yLimVal)
 
 %%
 for dd = 1:size(Data, 2)
@@ -11,7 +11,7 @@ for dd = 1:size(Data, 2)
     ylabel('\Delta%');
     pbaspect([1 1 1]);
     title({strrep(Data(1, dd).label, '_', ' ')});
-    xlim([min(Data(1, dd).t) max(Data(1, dd).t)]);
+    xlim([0 xLimVal]);
     ylim(100*[-yLimVal yLimVal]);
     set(gca, 'TickDir', 'out');
     set(gcf, 'PaperPosition', [0 0 4 4]); %Position plot at left hand corner with width 15 and height 6.
