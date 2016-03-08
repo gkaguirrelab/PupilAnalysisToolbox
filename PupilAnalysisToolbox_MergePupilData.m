@@ -1,4 +1,4 @@
-function PupilAnalysisToolbox_MergePupilData
+function PupilAnalysisToolbox_MergePupilData(theFileFullPath)
 % PupilAnalysisToolbox_MergePupilData
 %
 % Merges files created on the Windows machine with the experimental file
@@ -6,9 +6,16 @@ function PupilAnalysisToolbox_MergePupilData
 %
 % 1/25/16   spitschan   Wrote it.
 
-%% Open the dialogue to get the file name
-[theFile, thePath] = uigetfile;
-[~, theFileName] = fileparts(theFile);
+if isempty(theFileFullPath)
+    %% Open the dialogue to get the file name
+    [theFile, thePath] = uigetfile;
+    [~, theFileName] = fileparts(theFile);
+else
+    %% Get the file names from the input
+    [thePath, theFileName] = fileparts(theFileFullPath);
+    theFile = [theFileName filesep '*.mat'];
+end
+
 theFilesRaw = dir([thePath filesep theFileName filesep '*.mat']);
 nFilesRaw = length(theFilesRaw);
 
