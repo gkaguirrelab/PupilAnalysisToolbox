@@ -8,7 +8,7 @@ params = PupilAnalysisToolbox_GetDefaultParams;
 params.StepDurSecs = 5.5;
 params.yLim = 0.8;
 
-Subjects = {'MELA_0043' 'MELA_0038'};
+Subjects = {'MELA_0045' 'MELA_0043' 'MELA_0038'};
 Protocols={'SilentSubstitutionPIPR_PIPR5_5sPulse'};
 
 basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/SilentSubstitutionPIPR_PIPR5_5sPulse'];
@@ -26,7 +26,7 @@ params = PupilAnalysisToolbox_GetDefaultParams;
 params.StepDurSecs = 5.5;
 params.yLim = 0.8;
 
-Subjects = {'MELA_0043' 'MELA_0038'};
+Subjects = {'MELA_0045' 'MELA_0043' 'MELA_0038'};
 Protocols={'SilentSubstitutionPIPR_SS5_5sPulse'};
 
 basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/SilentSubstitutionPIPR_SS5_5sPulse'];

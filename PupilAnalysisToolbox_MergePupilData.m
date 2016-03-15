@@ -13,7 +13,7 @@ if isempty(theFileFullPath)
 else
     %% Get the file names from the input
     [thePath, theFileName] = fileparts(theFileFullPath);
-    theFile = [theFileName filesep '*.mat'];
+    theFile = [theFileName '.mat'];
 end
 
 theFilesRaw = dir([thePath filesep theFileName filesep '*.mat']);
