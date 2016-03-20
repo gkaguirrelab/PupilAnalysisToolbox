@@ -59,23 +59,20 @@ for SubjectID=1:length(Subjects)
                 % adaptation to the background.
                 BackgroundAdaptData(sess,p)=TempData(1);
                 
-                TempData(1)=[]; TempTrialFrequencies(1)=[]; TempTrialDirections(1)=[]; TempTrialPhases(1)=[]; TempTrialContrasts(1) = [];
-                TempData(2)=[]; TempTrialFrequencies(2)=[]; TempTrialDirections(2)=[]; TempTrialPhases(2)=[]; TempTrialContrasts(2) = [];
-                
                 % Now remove those trials that have insufficient time points
                 NumTrials = length(TempData);
-                trial = 1;
-                while (trial<NumTrials)
-                    if ((TempData(trial).time(end)/1000) < params.minimum_length_trial)
-                        TempData(trial) = [];
-                        TempTrialFrequencies(trial) = [];
-                        TempTrialDirections(trial) = [];
-                        TempTrialPhases(trial) = [];
-                        TempTrialContrasts(trial) = [];
-                        NumTrials = NumTrials-1;
-                    else trial = trial+1;
-                    end
-                end
+                trial = NumTrials;
+%                 while (trial<NumTrials)
+%                     if ((TempData(trial).time(end)/1000) < params.minimum_length_trial)
+%                         TempData(trial) = [];
+%                         TempTrialFrequencies(trial) = [];
+%                         TempTrialDirections(trial) = [];
+%                         TempTrialPhases(trial) = [];
+%                         TempTrialContrasts(trial) = [];
+%                         NumTrials = NumTrials-1;
+%                     else trial = trial+1;
+%                     end
+%                 end
                 
                 % Now concatenate TempData to the full Data array
                 if (FirstGoodSessionFlag==1)
