@@ -138,6 +138,16 @@ for SubjectID=1:length(Subjects)
         end
         iy=iy((params.full_trial_length-params.final_trial_length)*params.sampling_frequency+1:params.full_trial_length*params.sampling_frequency);
         
+        if (params.TrialInspectorFlag==1)
+            figure(1);
+            plot(Data(trial).time,Data(trial).diameter, '-r');
+            figure(2);
+            plot(iy, '-k');
+            pbaspect([1 1 1]);
+            pause;
+            
+        end
+           
         % Align to zero stimulus phase. Phase shifting of the stimuli is in
         % units of the stimulus modulation, which is typically implemented
         % in 200 discrete steps (Set in AlphaSpacing). The stored trial
