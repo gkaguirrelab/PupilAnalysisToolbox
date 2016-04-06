@@ -7,7 +7,7 @@ function PupilAnalysisToolbox_MergePupilData(theFileFullPath)
 % 1/25/16   spitschan   Wrote it.
 % 4/6/16    spitschan   Case when there is no input passed.
 
-if exist('theFileFullPath', 'var');
+if ~exist('theFileFullPath', 'var');
    theFileFullPath = []; 
 end
 
