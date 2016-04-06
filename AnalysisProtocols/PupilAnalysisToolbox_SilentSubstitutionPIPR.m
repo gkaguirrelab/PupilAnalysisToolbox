@@ -7,7 +7,7 @@ userID = strtrim(userID);
 params = PupilAnalysisToolbox_GetDefaultParams;
 params.StepDurSecs = 5.5;
 params.yLim = 0.8;
-params.TrialInspectorFlag = 0; % trial-by-trial turned off
+params.TrialInspectorFlag = false; % trial-by-trial turned off
 
 % This is a list of all the subjects
 
@@ -29,8 +29,11 @@ params.TrialInspectorFlag = 0; % trial-by-trial turned off
 % This is a subject listing that could be used to examine the data from a
 % single subject and check data quality
 
-Subjects = {'MELA_0043'};
-
+Subjects = {'MELA_0001' 'MELA_0002' ...
+    'MELA_0038' 'MELA_0043' 'MELA_0045' ...
+    'MELA_0049' 'MELA_0050' 'MELA_0057' ...
+    'MELA_0061' 'MELA_0062'  'MELA_0065' ...
+    }
 
 Protocols={'SilentSubstitutionPIPR_PIPR5_5sPulse'};
 
@@ -48,7 +51,7 @@ PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params.x
 params = PupilAnalysisToolbox_GetDefaultParams;
 params.StepDurSecs = 5.5;
 params.yLim = 0.8;
-params.TrialInspectorFlag = 0; % trial-by-trial turned off
+params.TrialInspectorFlag = false; % trial-by-trial turned off
 
 % This is a list of all the subjects
 
@@ -70,7 +73,11 @@ params.TrialInspectorFlag = 0; % trial-by-trial turned off
 % This is a subject listing that could be used to examine the data from a
 % single subject and check data quality
 
-Subjects = {'MELA_0043'};
+Subjects = {'MELA_0001' 'MELA_0002' ...
+    'MELA_0038' 'MELA_0043' 'MELA_0045' ...
+    'MELA_0049' 'MELA_0050' 'MELA_0057' ...
+    'MELA_0061' 'MELA_0062'  'MELA_0065' ...
+    }
 
 Protocols={'SilentSubstitutionPIPR_SS5_5sPulse'};
 
