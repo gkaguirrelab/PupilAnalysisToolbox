@@ -62,18 +62,26 @@ for SubjectID=1:length(Subjects)
                 % Now remove those trials that have insufficient time points
                 NumTrials = length(TempData);
                 trial = NumTrials;
-%                 while (trial<NumTrials)
-%                     if ((TempData(trial).time(end)/1000) < params.minimum_length_trial)
-%                         TempData(trial) = [];
-%                         TempTrialFrequencies(trial) = [];
-%                         TempTrialDirections(trial) = [];
-%                         TempTrialPhases(trial) = [];
-%                         TempTrialContrasts(trial) = [];
-%                         NumTrials = NumTrials-1;
-%                     else trial = trial+1;
-%                     end
-%                 end
-                
+                %                 while (trial<NumTrials)
+                %                     if ((TempData(trial).time(end)/1000) < params.minimum_length_trial)
+                %                         TempData(trial) = [];
+                %                         TempTrialFrequencies(trial) = [];
+                %                         TempTrialDirections(trial) = [];
+                %                         TempTrialPhases(trial) = [];
+                %                         TempTrialContrasts(trial) = [];
+                %                         NumTrials = NumTrials-1;
+                %                     elseif isempty(TempData(trial).time)
+                %                         trial
+                %                         TempData(trial) = [];
+                %                         TempTrialFrequencies(trial) = [];
+                %                         TempTrialDirections(trial) = [];
+                %                         TempTrialPhases(trial) = [];
+                %                         TempTrialContrasts(trial) = [];
+                %                         NumTrials = NumTrials-1;
+                %                     else trial = trial+1;
+                %                     end
+                %                 end
+                %
                 % Now concatenate TempData to the full Data array
                 if (FirstGoodSessionFlag==1)
                     Data = TempData;
@@ -124,52 +132,58 @@ for SubjectID=1:length(Subjects)
         Data(trial).time=Data(trial).time-params.StimOnsetDelay;
         
         % smooth, interpolate, and resample the data
-        iy=SGolaySmooth(Data(trial).time,Data(trial).diameter,params.sgolay_span,params.sgolay_polynomial,params.sampling_frequency,params.full_trial_length);
-        
-        % clip to params.full_trial_length
-        iy=iy(1:params.full_trial_length*params.sampling_frequency);
-        
-        % Temporarily crop to params.final_trial_length to allow corrections of
-        % phase offsets in the stimuli.
-        % Check to make sure that we are not asking for a final trial
-        % length longer than the full trial length
-        if (params.final_trial_length>params.full_trial_length)
-            error('params.final_trial_length must be less than or equal to params.full_trial_length')
-        end
-        iy=iy((params.full_trial_length-params.final_trial_length)*params.sampling_frequency+1:params.full_trial_length*params.sampling_frequency);
-        
-        if (params.TrialInspectorFlag==1)
-            figure(1);
-            plot(Data(trial).time,Data(trial).diameter, '-r');
-            figure(2);
-            plot(iy, '-k');
-            pbaspect([1 1 1]);
-            pause;
+        if ~isempty(Data(trial).time)
+            iy=SGolaySmooth(Data(trial).time,Data(trial).diameter,params.sgolay_span,params.sgolay_polynomial,params.sampling_frequency,params.full_trial_length);
             
+            
+            % clip to params.full_trial_length
+            iy=iy(1:params.full_trial_length*params.sampling_frequency);
+            
+            % Temporarily crop to params.final_trial_length to allow corrections of
+            % phase offsets in the stimuli.
+            % Check to make sure that we are not asking for a final trial
+            % length longer than the full trial length
+            if (params.final_trial_length>params.full_trial_length)
+                error('params.final_trial_length must be less than or equal to params.full_trial_length')
+            end
+            iy=iy((params.full_trial_length-params.final_trial_length)*params.sampling_frequency+1:params.full_trial_length*params.sampling_frequency);
+            
+            if (params.TrialInspectorFlag==1)
+                figure(1);
+                plot(Data(trial).time,Data(trial).diameter, '-r');
+                figure(2);
+                plot(iy, '-k');
+                pbaspect([1 1 1]);
+                pause;
+                
+            end
+            
+            % Align to zero stimulus phase. Phase shifting of the stimuli is in
+            % units of the stimulus modulation, which is typically implemented
+            % in 200 discrete steps (Set in AlphaSpacing). The stored trial
+            % phase value is the step on which the stimulus started. For the
+            % Gaussian pulse stimuli, the phase shift is performed simply as a
+            % shift in the specified mirror settings. The shift direction
+            % is always positive, as the value in TrialPhases is either zero
+            % (requiring no shift) or a positive integer.
+            
+            % One is subtracted from the TrialPhases value as a value of one
+            % corresponds to the first mirror setting group, which is a phase
+            % advancement of zero.
+            
+            AmountToShift= TrialPhases(trial)*...  % Length of stimulus cycle in seconds
+                params.sampling_frequency*...;  % number of data samples per second
+                (1);    % we need to phase advance
+            
+            % fshift implements a sinc shift, as we may have a non-integer shift
+            orig_iy = iy;
+            %iy=fshift(orig_iy,AmountToShift);
+            tmp = NaN*ones(size(orig_iy));
+            tmp(1:length((AmountToShift+1):length(iy))) = orig_iy((AmountToShift+1):length(iy));
+        else
+            tmp = NaN;
         end
-           
-        % Align to zero stimulus phase. Phase shifting of the stimuli is in
-        % units of the stimulus modulation, which is typically implemented
-        % in 200 discrete steps (Set in AlphaSpacing). The stored trial
-        % phase value is the step on which the stimulus started. For the
-        % Gaussian pulse stimuli, the phase shift is performed simply as a
-        % shift in the specified mirror settings. The shift direction
-        % is always positive, as the value in TrialPhases is either zero
-        % (requiring no shift) or a positive integer.
         
-        % One is subtracted from the TrialPhases value as a value of one
-        % corresponds to the first mirror setting group, which is a phase
-        % advancement of zero.
-        
-        AmountToShift= TrialPhases(trial)*...  % Length of stimulus cycle in seconds
-            params.sampling_frequency*...;  % number of data samples per second
-            (1);    % we need to phase advance
-        
-        % fshift implements a sinc shift, as we may have a non-integer shift
-        orig_iy = iy;
-        %iy=fshift(orig_iy,AmountToShift);
-        tmp = NaN*ones(size(orig_iy));
-        tmp(1:length((AmountToShift+1):length(iy))) = orig_iy((AmountToShift+1):length(iy));
         TimeSeries(trial, :) = tmp;
         % Store the mean pupil size.
         
@@ -243,7 +257,7 @@ for SubjectID=1:length(Subjects)
     cd(fullfile(resultsPath, char(Subjects(SubjectID))));
     fprintf(['\n\t*** Averaging ' num2str(length(UniqueFreqs)*length(UniqueDirections)) ' crossings of frequency and direction.']); % Update user
     dd = 0;
-        
+    
     timeVector = 0:1/params.sampling_frequency:params.final_trial_length-1/params.sampling_frequency;
     
     outfile = [char(Subjects(SubjectID)) '_PupilPulseData_DataQuality.csv'];
@@ -427,7 +441,7 @@ for SubjectID=1:length(Subjects)
         
     end % for number of unique directions
     fclose(fid);
-
+    
     xLim = params.xLim;
     yLim = params.yLim;
     % Plot the time series
