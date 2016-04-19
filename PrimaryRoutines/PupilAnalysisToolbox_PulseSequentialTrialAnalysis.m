@@ -62,24 +62,29 @@ for SubjectID=1:length(Subjects)
                 
                 % Now concatenate TempData to the full Data array
                 if (FirstGoodSessionFlag==1)
-                    Data = TempData;
+                    rData = TempData;
                     for trial = 1:NumTrials
-                        Data(trial).frequencies = TempTrialFrequencies;
-                        Data(trial).directions = TempTrialDirections;
-                        Data(trial).phases = TempTrialPhases;
-                        Data(trial).contrasts = TempTrialContrasts;
+                        rData(trial).frequencies = TempTrialFrequencies;
+                        rData(trial).directions = TempTrialDirections;
+                        rData(trial).phases = TempTrialPhases;
+                        rData(trial).contrasts = TempTrialContrasts;
                     end
                     FirstGoodSessionFlag = 0;
                 else
-                    Data(end+1:end+NumTrials) = TempData(1:end);
-                    Data(end+1:end+NumTrials).frequencies = TempTrialFrequencies(1:end);
-                    Data(end+1:end+NumTrials).directions = TempTrialDirections(1:end);
-                    Data(end+1:end+NumTrials).phases = TempTrialPhases(1:end);
-                    Data(end+1:end+NumTrials).contrasts = TempTrialContrasts(1:end);
+                    rData(end+1:end+NumTrials) = TempData(1:end);
+                    rData(end+1:end+NumTrials).frequencies = TempTrialFrequencies(1:end);
+                    rData(end+1:end+NumTrials).directions = TempTrialDirections(1:end);
+                    rData(end+1:end+NumTrials).phases = TempTrialPhases(1:end);
+                    rData(end+1:end+NumTrials).contrasts = TempTrialContrasts(1:end);
                 end
             end % if file exists
         end % loop over directions
     end % loop over sessions
+    
+    % Clean up the data struct
+    pData.pupilDiameterMm = rData.diameter;
+    pData.timeStamps
+    rawPupilDiameter
     
     fprintf('done.'); % Notify user
     
