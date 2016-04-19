@@ -50,7 +50,7 @@ p.addOptional('BadPercentChangeThreshold', 0.8, @isscalar); % Any time point wit
 p.addOptional('BadNaNThreshold', 0.1, @isscalar); % If more than this proportion
 % of a trial time series is composed of NaNs, discard the trial
 p.addOptional('yLim', 0.8, @isscalar); % Plotting range for y axis
-p.addOptional('xLim', 35, @isscalar); % Plotting range for y axis
+p.addOptional('xLim', 30, @isscalar); % Plotting range for y axis
 
 % Extract and assign the inputs
 p.parse(varargin{:});
