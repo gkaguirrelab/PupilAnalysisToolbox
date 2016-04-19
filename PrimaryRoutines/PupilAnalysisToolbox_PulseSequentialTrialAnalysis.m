@@ -242,6 +242,7 @@ for SubjectID=1:length(Subjects)
             UniqueDirectionLabels{ix} = newLabels{i};
         end
     end
+        
     % Create a vector that contains the Gaussian stimulation
     
     FWHM=3.8; % width of the stimulation Gaussian in seconds
@@ -260,9 +261,18 @@ for SubjectID=1:length(Subjects)
     
     timeVector = 0:1/params.sampling_frequency:params.final_trial_length-1/params.sampling_frequency;
     
+    % Set up saving of two data quality files. One gives the summary
+    % information regarding the number of rejected trials in each category
+    % of trial type. The second provides a vector of which trials in the
+    % order that they were acquired were marked as bad.
+    
     outfile = [char(Subjects(SubjectID)) '_PupilPulseData_DataQuality.csv'];
-    fid = fopen(outfile, 'w');
-    fprintf(fid, 'Direction,Rejected trials,Total trials,Percentage rejected\n');
+    fid_quality = fopen(outfile, 'w');
+    fprintf(fid_quality, 'Direction,Rejected trials,Total trials,Percentage rejected\n');
+
+    outfile = [char(Subjects(SubjectID)) '_PupilPulseData_BadTrialVector.csv'];
+    fid_badTrialVector = fopen(outfile, 'w');
+    
     rejectNCumulative = 0;
     totalNCumulative = 0;
     for f=1:length(UniqueFreqs)
@@ -395,8 +405,14 @@ for SubjectID=1:length(Subjects)
                         if sum(isnan(TimeSeriesMatrixOrig(:, m)))/length(TimeSeriesMatrixOrig(:, m)) > params.BadNaNThreshold;
                             invalid(m) = 1;
                             rejectN(d) = rejectN(d)+1;
+                            fprintf(fid_badTrialVector,'1');
                         else
                             invalid(m) = 0;
+                            fprintf(fid_badTrialVector,'0');
+                        end
+                        
+                        if m ~= size(TimeSeriesMatrixOrig, 2)
+                            fprintf(fid_badTrialVector,',');
                         end
                     end
                     rejectNCumulative = rejectNCumulative+rejectN(d);
@@ -405,11 +421,12 @@ for SubjectID=1:length(Subjects)
                     
                     invalid = logical(invalid);
                     TimeSeriesMatrixOrig(:, invalid) = [];
-                    % Save the data quality information
-                    fprintf(fid, '%s,%g,%g,%.2f\n', UniqueDirectionLabels{d}, rejectN(d), totalN(d), (rejectN(d)/totalN(d)));
-                    
-                    
+
+                    % Save and report the data quality information
+                    fprintf(fid_quality, '%s,%g,%g,%.2f\n', UniqueDirectionLabels{d}, rejectN(d), totalN(d), (rejectN(d)/totalN(d)));
                     fprintf('\n\t-> %s: rejecting %g of %g (%.2f)', UniqueDirectionLabels{d}, rejectN(d), totalN(d), (rejectN(d)/totalN(d)));
+                                        
+                    
                     % Now, with the blinks etc. removed, do normalize by mean
                     % again
                     theMean = mean(TimeSeriesMatrixOrig(1:100, :));
@@ -437,10 +454,11 @@ for SubjectID=1:length(Subjects)
                 
             end
         end % if indices is not length zero
-        fprintf(fid, 'Total,%g,%g,%.2f\n', rejectNCumulative, totalNCumulative, (rejectNCumulative/totalNCumulative));
+        fprintf(fid_quality, 'Total,%g,%g,%.2f\n', rejectNCumulative, totalNCumulative, (rejectNCumulative/totalNCumulative));
         
     end % for number of unique directions
-    fclose(fid);
+    fclose(fid_quality);
+    fclose(fid_badTrialVector);
     
     xLim = params.xLim;
     yLim = params.yLim;
