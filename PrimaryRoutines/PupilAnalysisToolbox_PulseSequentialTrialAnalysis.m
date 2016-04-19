@@ -59,15 +59,16 @@ for SubjectID=1:length(Subjects)
                 
                 % Now remove those trials that have insufficient time points
                 NumTrials = length(TempData);
-                trial = NumTrials;
                 
                 % Now concatenate TempData to the full Data array
                 if (FirstGoodSessionFlag==1)
                     Data = TempData;
-                    Data.frequencies = TempTrialFrequencies;
-                    Data.directions = TempTrialDirections;
-                    Data.phases = TempTrialPhases;
-                    Data.contrasts = TempTrialContrasts;
+                    for trial = 1:NumTrials
+                        Data(trial).frequencies = TempTrialFrequencies;
+                        Data(trial).directions = TempTrialDirections;
+                        Data(trial).phases = TempTrialPhases;
+                        Data(trial).contrasts = TempTrialContrasts;
+                    end
                     FirstGoodSessionFlag = 0;
                 else
                     Data(end+1:end+NumTrials) = TempData(1:end);
@@ -105,7 +106,6 @@ for SubjectID=1:length(Subjects)
         % this and return a vector that is just from time point zero
         % onward.
         Data(trial).time=Data(trial).time-params.StimOnsetDelay;
-        Data(trial).
         
         % smooth, interpolate, and resample the data
         if ~isempty(Data(trial).time)
@@ -208,7 +208,7 @@ for SubjectID=1:length(Subjects)
         csvwrite(timeSeriesOutFile, TimeSeriesMatrix);
         
         IterationCount=(f-1)*length(UniqueDirections) + d;
-        Indices = find(strcmp(TrialDirections,UniqueDirections(d))));
+        Indices = find(strcmp(TrialDirections,UniqueDirections(d)));
         
         dd = dd+1;
         if (not(isempty(Indices)))
