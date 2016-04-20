@@ -56,11 +56,12 @@ for SubjectID=1:length(Subjects)
                         rData(trial).direction = [tmp0{2} '-' tmp0{3}];
                     end
                 else
-                    rData(end+1:end+NumTrials) = TempData(1:end);
+                    endIdx = size(rData, 1);
+                    rData(endIdx+1:endIdx+NumTrials) = TempData(1:end);
                     for trial = 1:NumTrials
                         % Assign the direction label
                         tmp0 = allwords(TempTrialDirections{trial}, '-');
-                        rData(end+trial).direction = [tmp0{2} '-' tmp0{3}];
+                        rData(endIdx+trial).direction = [tmp0{2} '-' tmp0{3}];
                     end
                 end
             end % if file exists

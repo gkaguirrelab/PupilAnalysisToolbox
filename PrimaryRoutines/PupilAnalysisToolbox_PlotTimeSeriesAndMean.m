@@ -22,7 +22,6 @@ for dd = 1:size(Data, 2)
     outFile2 = fullfile(resultsPath, ['TimeSeries_' strrep(Data(1, dd).label, '_', ' ') '.png']);
     saveas(gcf, outFile2, 'png');
     close(gcf);
-    
 end
 
 %% Plot comparisons
