@@ -42,7 +42,7 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/S
 newLabels = {'Background', 'PIPRBlue', 'PIPRRed'};
 oldLabels = {'SilentSubstitutionPIPRBackgroundPIPR-45s', 'SilentSubstitutionPIPRBlue-45sPositivePulse5_5s', 'SilentSubstitutionPIPRRed-45sPositivePulse5_5s'};
 Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
-PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params, {[2 3]}, {[1 -1]});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% SilentSubstitutionPIPR_SS5_5sPulse

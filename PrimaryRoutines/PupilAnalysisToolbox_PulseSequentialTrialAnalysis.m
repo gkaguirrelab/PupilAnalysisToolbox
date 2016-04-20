@@ -250,7 +250,7 @@ for SubjectID=1:length(Subjects)
         ReturnData(SubjectID, dd).SEMTimeSeries = nanstd(ReturnData(SubjectID, dd).TimeSeries, [], 2) / sqrt(size(ReturnData(SubjectID, dd).TimeSeries, 2));
         
         % 2. Plot the data
-        plot([0 params.xLim], [0 0], '-', 'Color', [0.3 0.3 0.3]); hold on;
+        plot([-params.PulseOnsetSecs params.xLim], [0 0], '-', 'Color', [0.3 0.3 0.3]); hold on;
         shadedErrorBar(ReturnData(SubjectID, dd).timeSecs, ReturnData(SubjectID, dd).AvgTimeSeries, ...
             ReturnData(SubjectID, dd).SEMTimeSeries);
         plot([0 params.PulseDurationSecs], [0.1 0.1], '-r', 'LineWidth', 2);
