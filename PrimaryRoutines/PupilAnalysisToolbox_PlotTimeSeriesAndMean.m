@@ -1,4 +1,4 @@
-function PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params)
+function PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params, comparisonsIdx, comparisonsPolarity)
 %  PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params)
 
 for dd = 1:size(Data, 2)
@@ -25,24 +25,25 @@ for dd = 1:size(Data, 2)
 end
 
 %%
-% for jj = 1:size(Data, 1)
-%     diff(:, jj) = Data(jj, 2).AvgTimeSeries-Data(jj, 3).AvgTimeSeries;
-% end
-% hold on
-%     plot([5 5], 100*[-params.yLim params.yLim], 'r');
-%     plot([min(Data(1, 1).t) max(Data(1, 1).t)], [0 0], '-k');
-%     shadedErrorBar(Data(1, 2).t, 100*nanmean(diff, 2), 100*nanstd(diff, [], 2)/sqrt(size(diff, 2)));
-%     xlabel('Time [s]');
-%     ylabel('Difference in \Delta%');
-%     pbaspect([1 1 1]);
-%     title([strrep(Data(1, 2).label, '_', ' ') ' - ' strrep(Data(1, 3).label, '_', ' ')]);
-%     xlim([0 params.xLim]);
-%     ylim(100*[-params.yLim params.yLim]);
-%     set(gca, 'TickDir', 'out');
-%     set(gcf, 'PaperPosition', [0 0 4 4]); %Position plot at left hand corner with width 15 and height 6.
-%     set(gcf, 'PaperSize', [4 4]); %Set the paper to have width 15 and height 6.
-%     saveas(gcf, fullfile(resultsPath, ['TimeSeries_' strrep(Data(2, 2).label, '_', ' ') ' - ' strrep(Data(3, 3).label, '_', ' ') '.pdf']), 'pdf');
-%     close(gcf);
+for ii = 1:length(comparisonsIdx)
+    for jj = 1:size(Data, 1)
+        diff(:, jj) = Data(jj, comparisonsPolarity{ii}(1)*comparisonsIdx{ii}(1)).AvgTimeSeries + comparisonsPolarity{ii}(2)*Data(jj, comparisonsIdx{ii}(2)).AvgTimeSeries;
+    end
+    hold on
+    plot([5 5], 100*[-params.yLim params.yLim], 'r');
+    plot([min(Data(1, 1).t) max(Data(1, 1).t)], [0 0], '-k');
+    shadedErrorBar(Data(1, 2).t, 100*nanmean(diff, 2), 100*nanstd(diff, [], 2)/sqrt(size(diff, 2)));
+    xlabel('Time [s]');
+    ylabel('Difference in \Delta%');
+    pbaspect([1 1 1]);
+        xlim([0 params.xLim]);
+    ylim(100*[-params.yLim params.yLim]);
+    set(gca, 'TickDir', 'out');
+    set(gcf, 'PaperPosition', [0 0 4 4]); %Position plot at left hand corner with width 15 and height 6.
+    set(gcf, 'PaperSize', [4 4]); %Set the paper to have width 15 and height 6.
+    saveas(gcf, fullfile(resultsPath, ['TimeSeries_' strrep(Data(2, comparisonsIdx{ii}(1)).AvgTimeSeries).label, '_', ' ') ' - ' strrep(Data(3, comparisonsIdx{ii}(2)).AvgTimeSeries).label, '_', ' ') '.pdf']), 'pdf');
+    close(gcf);
+end
 
 % for jj = 1:size(Data, 1)
 %     diff(:, jj) = Data(jj, 2).AvgTimeSeries-Data(jj, 1).AvgTimeSeries;
