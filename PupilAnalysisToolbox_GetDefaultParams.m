@@ -44,7 +44,7 @@ p.addOptional('VelocitySearchWindowSize', 10, @isscalar);
 p.addOptional('VelocityMarginWindowSize', 30, @isscalar);
 p.addOptional('VelocitySmoothingParam', 5, @isscalar);
 
-p.addOptional('sgolay_span', 20, @isscalar); % Parameters of the SGolay interpolation prior to interpolation
+p.addOptional('sgolay_span', 40, @isscalar); % Parameters of the SGolay interpolation prior to interpolation
 p.addOptional('sgolay_polynomial', 7, @isscalar);
 p.addOptional('BadPercentChangeThreshold', 0.8, @isscalar); % Any time point with an absolute change from
 % the mean of greater than this proportion will be NaN-ed, as it is certainly noise

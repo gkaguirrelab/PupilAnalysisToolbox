@@ -114,19 +114,11 @@ for SubjectID=1:length(Subjects)
         pData(trial).timeMSecs = pData(trial).timeMSecs-params.StimOnsetDelay;
         
         % smooth, interpolate, and resample the data
-        if ~isempty(pData(trial).timeMSecs)
+        if ~isempty(pData(trial).timeMSecs) && (~(numel(pData(trial).timeMSecs) == 1))
             % Fix to deal with sgolay smoothing. If the last value in the
             % time series is NaN, we set it to be the NaN mean of the
             % series.
-            if isnan(pData(trial).pupilDiameterMm(end))
-              pData(trial).pupilDiameterMm(end) = nanmean(pData(trial).pupilDiameterMm);
-            end
-            validIdx = ~isnan(pData(trial).pupilDiameterMm);
-            invalidIdx = isnan(pData(trial).pupilDiameterMm);
-            iy = SGolaySmooth(pData(trial).timeMSecs(validIdx), pData(trial).pupilDiameterMm(validIdx),...
-                params.sgolay_span, params.sgolay_polynomial, params.sampling_frequency,...
-                params.full_trial_length);
-            iy(invalidIdx) = NaN;
+            iy = pData(trial).pupilDiameterMm;
             
             % clip to params.full_trial_length
             iy = iy(1:params.full_trial_length*params.sampling_frequency);
@@ -154,7 +146,7 @@ for SubjectID=1:length(Subjects)
         else
             pData(trial).timeSecs = linspace(0, params.minimum_trial_length-(1/params.sampling_frequency), params.minimum_trial_length*params.sampling_frequency);
             pData(trial).timeMSecs = 1000*pData(trial).timeSecs;
-            pData(trial).pupilDiameterMm = NaN;
+            pData(trial).pupilDiameterMm = NaN*ones(size(pData(trial).timeSecs));
         end
     end
     fprintf('. - Done.\n'); % notify user we are done the loop
@@ -170,7 +162,7 @@ for SubjectID=1:length(Subjects)
         fprintf('%d', trial);       % update progress trial number
         
         % 1. Mean-center the data
-        pData(trial).meanBaseline = mean(pData(trial).pupilDiameterMm(meanCenterWindowIdx));
+        pData(trial).meanBaseline = nanmean(pData(trial).pupilDiameterMm(meanCenterWindowIdx));
         pData(trial).pupilDiameterMmMeanCentered = ((pData(trial).pupilDiameterMm-repmat(pData(trial).meanBaseline, ...
             size(pData(trial).pupilDiameterMm, 1), 1))./repmat(pData(trial).meanBaseline, ...
             size(pData(trial).pupilDiameterMm, 1), 1));
@@ -182,13 +174,22 @@ for SubjectID=1:length(Subjects)
         pData(trial).pupilDiameterMmDespiked = pData(trial).pupilDiameterMm;
         pData(trial).pupilDiameterMmDespiked(pData(trial).removePoints) = NaN;
         
-        % 4. Mean-center again
-        pData(trial).meanBaseline = mean(pData(trial).pupilDiameterMmDespiked(meanCenterWindowIdx));
-        pData(trial).pupilDiameterMmMeanCentered = ((pData(trial).pupilDiameterMm-repmat(pData(trial).meanBaseline, ...
+        % 4. Interpolate
+        theNans = isnan(pData(trial).pupilDiameterMmDespiked);
+        if sum(~theNans) > 1
+            x = pData(trial).pupilDiameterMmDespiked;
+            x(theNans) = interp1(pData(trial).timeSecs(~theNans), pData(trial).pupilDiameterMmDespiked(~theNans), ...
+                pData(trial).timeSecs(theNans), 'linear');
+            pData(trial).pupilDiameterMmDespiked = x;
+        end
+        
+        % 5. Mean-center again
+        pData(trial).meanBaseline = nanmean(pData(trial).pupilDiameterMmDespiked(meanCenterWindowIdx));
+        pData(trial).pupilDiameterMmMeanCentered = ((pData(trial).pupilDiameterMmDespiked-repmat(pData(trial).meanBaseline, ...
             size(pData(trial).pupilDiameterMm, 1), 1)) ./ repmat(pData(trial).meanBaseline, ...
             size(pData(trial).pupilDiameterMm, 1), 1));
         
-        % 5. (optional) Display the trial and the removed points
+        % 6. (optional) Display the trial and the removed points
         if (params.TrialInspectorFlag == 1)
             figure(figTrialInspector); hold off;
             plot(pData(trial).timeSecs, pData(trial).pupilDiameterMm, '-r'); hold on;
@@ -200,12 +201,12 @@ for SubjectID=1:length(Subjects)
             pause;
         end
         
-        % 6. Relabel the direction name
+        % 7. Relabel the direction name
         labelIdx = find(ismember(oldLabels, pData(trial).direction));
         pData(trial).direction = newLabels{labelIdx};
         
-        % 7. Determine the proportion of missing data points
-        pData(trial).propMissingData = sum(isnan(pData(trial).pupilDiameterMmDespiked))/length(pData(trial).pupilDiameterMmDespiked);
+        % 8. Determine the proportion of missing data points
+        pData(trial).propMissingData = sum(theNans)/length(pData(trial).pupilDiameterMmDespiked);
         if pData(trial).propMissingData > params.BadNaNThreshold
             pData(trial).dataQualityPass = 0;
         else
@@ -240,7 +241,7 @@ for SubjectID=1:length(Subjects)
     %% Calculate averages
     for dd = 1:length(newLabels)
         % 1. Assemble the data
-        ind = find(ismember({pData.direction}, newLabels{dd}));
+        ind = find(ismember({pData.direction}, newLabels{dd}) & [pData.dataQualityPass]);
         ReturnData(SubjectID, dd).label = newLabels{dd};
         ReturnData(SubjectID, dd).timeSecs = pData(ind(1)).timeSecs-params.PulseOnsetSecs';
         ReturnData(SubjectID, dd).TimeSeries = cell2mat({pData(ind).pupilDiameterMmMeanCentered}')';
