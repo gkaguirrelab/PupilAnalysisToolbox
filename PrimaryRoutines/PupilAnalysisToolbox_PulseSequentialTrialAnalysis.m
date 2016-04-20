@@ -14,19 +14,8 @@ for SubjectID=1:length(Subjects)
     clear TrialDirections;
     clear TrialFrequencies;
     clear TrialPhases;
-    clear AmplitudesByTrial;
-    clear AvgModelFits;
-    clear AvgModelFits;
-    clear BackgroundAdaptData;
-    clear MeanMatrix;
-    clear AvgTimeSeries;
-    clear SEMTimeSeries;
-    clear TimeSeriesMatrixStore;
-    clear Indices;
-    clear TimeSeriesMatrix;
-    clear theValid;
-    clear theMeanMatrix;
-    clear invalid;
+    clear rData;
+    clear pData;
     
     % Prepare plot figures for this subject
     if (params.TrialInspectorFlag == 1)
@@ -99,15 +88,15 @@ for SubjectID=1:length(Subjects)
     pData = rmfield(pData, 'rawPupilDiameter');
     NumTrials = length(pData);
     
-    fprintf('done.\n'); % Notify user
+    fprintf('- Done.\n'); % Notify user
     
     % Smooth, interpolate, and de-spike the data
     fprintf('\t*** Smoothing and interpolating <strong>%g</strong> trials...  ', NumTrials); % Update user
     
     % Iterate over all the data
-    for trial=1:length(pData)
+    for trial = 1:NumTrials
         % Trial counter
-        for j=0:log10(trial-1)
+        for j = 0:log10(trial-1)
             fprintf('\b');          % delete previous counter display
         end
         fprintf('%d', trial);       % update progress trial number
@@ -140,7 +129,7 @@ for SubjectID=1:length(Subjects)
             % phase offsets in the stimuli.
             % Check to make sure that we are not asking for a final trial
             % length longer than the full trial length
-            if (params.final_trial_length>params.full_trial_length)
+            if (params.final_trial_length > params.full_trial_length)
                 error('params.final_trial_length must be less than or equal to params.full_trial_length')
             end
             iy = iy((params.full_trial_length-params.final_trial_length)*params.sampling_frequency+1:params.full_trial_length*params.sampling_frequency);
@@ -153,20 +142,27 @@ for SubjectID=1:length(Subjects)
             tmp = NaN*ones(size(orig_iy));
             tmp(1:length((AmountToShift+1):length(iy))) = orig_iy((AmountToShift+1):length(iy));
             
-
-            pData(trial).timeSecs = linspace(0, params.valid_trial_length-(1/params.sampling_frequency), params.valid_trial_length*params.sampling_frequency);
+            pData(trial).timeSecs = linspace(0, params.minimum_trial_length-(1/params.sampling_frequency), params.minimum_trial_length*params.sampling_frequency);
             pData(trial).timeMSecs = 1000*pData(trial).timeSecs;
             pData(trial).pupilDiameterMm = tmp(1:length(pData(trial).timeSecs));
         else
-            pData(trial).timeSecs = linspace(0, params.valid_trial_length-(1/params.sampling_frequency), params.valid_trial_length*params.sampling_frequency);
+            pData(trial).timeSecs = linspace(0, params.minimum_trial_length-(1/params.sampling_frequency), params.minimum_trial_length*params.sampling_frequency);
             pData(trial).timeMSecs = 1000*pData(trial).timeSecs;
             pData(trial).pupilDiameterMm = NaN;
         end
     end
+    fprintf('. - Done.\n'); % notify user we are done the loop
     
     %% Data quality: Spike removing, making sure we have enough data points, ...
+    fprintf('\t*** De-spiking and mean-centering <strong>%g</strong> trials... ', NumTrials); % Update user
     meanCenterWindowIdx = find((pData(trial).timeSecs >= params.meanCenterWindow(1)) & (pData(trial).timeSecs <= params.meanCenterWindow(2)));
     for trial = 1:NumTrials
+        % Trial counter
+        for j=0:log10(trial-1)
+            fprintf('\b');          % delete previous counter display
+        end
+        fprintf('%d', trial);       % update progress trial number
+        
         % 1. Mean-center the data
         pData(trial).meanBaseline = mean(pData(trial).pupilDiameterMm(meanCenterWindowIdx));
         pData(trial).pupilDiameterMmMeanCentered = ((pData(trial).pupilDiameterMm-repmat(pData(trial).meanBaseline, ...
@@ -183,7 +179,7 @@ for SubjectID=1:length(Subjects)
         % 4. Mean-center again
         pData(trial).meanBaseline = mean(pData(trial).pupilDiameterMmDespiked(meanCenterWindowIdx));
         pData(trial).pupilDiameterMmMeanCentered = ((pData(trial).pupilDiameterMm-repmat(pData(trial).meanBaseline, ...
-            size(pData(trial).pupilDiameterMm, 1), 1))./repmat(pData(trial).meanBaseline, ...
+            size(pData(trial).pupilDiameterMm, 1), 1)) ./ repmat(pData(trial).meanBaseline, ...
             size(pData(trial).pupilDiameterMm, 1), 1));
         
         % 5. (optional) Display the trial and the removed points
@@ -210,7 +206,7 @@ for SubjectID=1:length(Subjects)
             pData(trial).dataQualityPass = 1;
         end
     end
-    fprintf('done.'); % notify user we are done the loop
+    fprintf('. - Done.\n'); % notify user we are done the loop
     
     %% Data quality
     % 1. Trial-by-trial information
@@ -239,8 +235,10 @@ for SubjectID=1:length(Subjects)
     for dd = 1:length(newLabels)
         % 1. Assemble the data
         ind = find(ismember({pData.direction}, newLabels{dd}));
-        ReturnData(SubjectID, dd).timeSecs = pData(ind(1)).timeSecs-params.PulseOnset;
+        ReturnData(SubjectID, dd).label = newLabels{dd};
+        ReturnData(SubjectID, dd).timeSecs = pData(ind(1)).timeSecs-params.PulseOnsetSecs';
         ReturnData(SubjectID, dd).TimeSeries = cell2mat({pData(ind).pupilDiameterMmMeanCentered}')';
+        ReturnData(SubjectID, dd).Mean = [pData(ind).meanBaseline];
         ReturnData(SubjectID, dd).AvgTimeSeries = nanmean(ReturnData(SubjectID, dd).TimeSeries, 2);
         ReturnData(SubjectID, dd).SEMTimeSeries = nanstd(ReturnData(SubjectID, dd).TimeSeries, [], 2) / sqrt(size(ReturnData(SubjectID, dd).TimeSeries, 2));
         
@@ -248,12 +246,12 @@ for SubjectID=1:length(Subjects)
         plot([0 params.xLim], [0 0], '-', 'Color', [0.3 0.3 0.3]); hold on;
         shadedErrorBar(ReturnData(SubjectID, dd).timeSecs, ReturnData(SubjectID, dd).AvgTimeSeries, ...
             ReturnData(SubjectID, dd).SEMTimeSeries);
-        plot([0 params.StepDurSecs], [0.1 0.1], '-r', 'LineWidth', 2);
+        plot([0 params.PulseDurationSecs], [0.1 0.1], '-r', 'LineWidth', 2);
         pbaspect([1 1 1]);
-        xlim([-params.PulseOnset params.xLim]); ylim([-params.yLim params.yLim]);
-        xlabel('Time [Secs]'); ylabel('Pupil diameter [% change]');
+        xlim([-params.PulseOnsetSecs params.xLim]); ylim([-params.yLim params.yLim]);
+        xlabel('Time [Secs]'); ylabel('Pupil diameter [change]');
         pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off;
-        title(newLabels{dd});
+        title({newLabels{dd} ['Mean\pm1SEM (n = ' num2str(length(ind)) ' trials)']});
         
         % 3. Save the plot
         if params.SavePlotFlag
@@ -265,17 +263,16 @@ for SubjectID=1:length(Subjects)
             saveas(gcf, outFile1, 'pdf');
             outFile2 = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '.png']);
             saveas(gcf, outFile2, 'png');
-            close(gcf);
+            %close(gcf);
         end
         
         % 4. (optional) Save the data
-        params.SaveDataFlag = false;
         if params.SaveDataFlag
             % Save out mean pupil size
-            outFile = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '.csv']);
-            csvwrite(outFile, M);
-            outFile = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' UniqueDirectionLabels{d} '.csv']);
-            csvwrite(outFile, MeanMatrix{1, d,:});
+            outFile = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '_TimeSeries.csv']);
+            csvwrite(outFile, ReturnData(SubjectID, dd).TimeSeries);
+            outFile = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '_Mean.csv']);
+            csvwrite(outFile, ReturnData(SubjectID, dd).Mean);
         end
     end
 end

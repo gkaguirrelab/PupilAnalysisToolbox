@@ -27,9 +27,10 @@ p.addOptional('adapt_length', 60, @isscalar); % Duration in seconds of the initi
 p.addOptional('sampling_frequency', 20, @isscalar); % The samples per second of our final data vectors
 p.addOptional('full_trial_length', 45, @isscalar); % The length in seconds of the full trial
 p.addOptional('final_trial_length', 40, @isscalar); % The length of each data trial after processing,
+
 % taken from the tail of each full data trial.
 % That is, we discard some data from the start of each trial.
-p.addOptional('minimum_length_trial', 35, @isscalar); % Any trial shorter than this will be discarded
+p.addOptional('minimum_trial_length', 35, @isscalar); % Any trial shorter than this will be discarded
 p.addOptional('spike_remover_params', [8 0.5 5], @isscalar); % 3-element vector with the following elements:
 % 1- The window size [in samples] to use for spike removal
 % 2- The max acceptable proportion change in the window
