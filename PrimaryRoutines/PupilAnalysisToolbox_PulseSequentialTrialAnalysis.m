@@ -78,7 +78,6 @@ for SubjectID=1:length(Subjects)
     pData = rmfield(pData, 'rawMmPositions');
     pData = rmfield(pData, 'rawFickPositions');
     pData = rmfield(pData, 'rawHelmholtzPositions');
-    [pData.timeMSecs] = pData.rawTimeStamps;
     [pData.timeMSecsRaw] = pData.rawTimeStamps;
     pData = rmfield(pData, 'time');
     pData = rmfield(pData, 'rawTimeStamps');
@@ -108,12 +107,11 @@ for SubjectID=1:length(Subjects)
         % negative value, but the subsequent SGolaySmooth step will handle
         % this and return a vector that is just from time point zero
         % onward.
-        pData(trial).timeMSecs = pData(trial).timeMSecs-params.StimOnsetDelay;
-        
         % Replace all 0 with NaN
         pData(trial).pupilDiameterMm(pData(trial).pupilDiameterMm == 0) = NaN;
         pData(trial).pupilDiameterMm = pData(trial).pupilDiameterMm';
-        pData(trial).timeMSecsRaw = pData(trial).timeMSecsRaw';
+        pData(trial).timeMSecs = pData(trial).timeMSecsRaw'-pData(trial).timeMSecsRaw(1);
+        pData(trial).timeMSecs = pData(trial).timeMSecs-params.StimOnsetDelay;
         
         % smooth, interpolate, and resample the data
         if ~isempty(pData(trial).timeMSecs)
@@ -125,7 +123,7 @@ for SubjectID=1:length(Subjects)
             end
             validIdx = ~isnan(pData(trial).pupilDiameterMm);
             invalidIdx = isnan(pData(trial).pupilDiameterMm);
-            iy = SGolaySmooth(pData(trial).timeMSecsRaw(validIdx), pData(trial).pupilDiameterMm(validIdx),...
+            iy = SGolaySmooth(pData(trial).timeMSecs(validIdx), pData(trial).pupilDiameterMm(validIdx),...
                 params.sgolay_span, params.sgolay_polynomial, params.sampling_frequency,...
                 params.full_trial_length);
             iy(invalidIdx) = NaN;
