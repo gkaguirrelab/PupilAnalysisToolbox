@@ -24,7 +24,7 @@ p.addOptional('StimOnsetDelay', 0, @isscalar); % This is the delay in msecs betw
 % This duration of data is chopped from the front of each trial prior to
 % the analysis to allow the phase measurements to be accurate.
 p.addOptional('adapt_length', 60, @isscalar); % Duration in seconds of the initial background adaptation period
-p.addOptional('sampling_frequency', 20, @isscalar); % The samples per second of our final data vectors
+p.addOptional('sampling_frequency', 50, @isscalar); % The samples per second of our final data vectors
 p.addOptional('full_trial_length', 45, @isscalar); % The length in seconds of the full trial
 p.addOptional('final_trial_length', 40, @isscalar); % The length of each data trial after processing,
 

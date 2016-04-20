@@ -78,12 +78,12 @@ for SubjectID=1:length(Subjects)
     pData = rmfield(pData, 'rawMmPositions');
     pData = rmfield(pData, 'rawFickPositions');
     pData = rmfield(pData, 'rawHelmholtzPositions');
-    [pData.timeMSecs] = pData.time;
+    [pData.timeMSecs] = pData.rawTimeStamps;
     [pData.timeMSecsRaw] = pData.rawTimeStamps;
     pData = rmfield(pData, 'time');
     pData = rmfield(pData, 'rawTimeStamps');
     [pData.pupilDiameterMmRaw] = pData.rawPupilDiameter;
-    [pData.pupilDiameterMm] = pData.diameter;
+    [pData.pupilDiameterMm] = pData.rawPupilDiameter;
     pData = rmfield(pData, 'diameter');
     pData = rmfield(pData, 'rawPupilDiameter');
     NumTrials = length(pData);
@@ -110,17 +110,25 @@ for SubjectID=1:length(Subjects)
         % onward.
         pData(trial).timeMSecs = pData(trial).timeMSecs-params.StimOnsetDelay;
         
+        % Replace all 0 with NaN
+        pData(trial).pupilDiameterMm(pData(trial).pupilDiameterMm == 0) = NaN;
+        pData(trial).pupilDiameterMm = pData(trial).pupilDiameterMm';
+        pData(trial).timeMSecsRaw = pData(trial).timeMSecsRaw';
+        
         % smooth, interpolate, and resample the data
         if ~isempty(pData(trial).timeMSecs)
             % Fix to deal with sgolay smoothing. If the last value in the
             % time series is NaN, we set it to be the NaN mean of the
             % series.
             if isnan(pData(trial).pupilDiameterMm(end))
-                pData(trial).pupilDiameterMm(end) = nanmean(pData(trial).pupilDiameterMm);
+              pData(trial).pupilDiameterMm(end) = nanmean(pData(trial).pupilDiameterMm);
             end
-            iy = SGolaySmooth(pData(trial).timeMSecs, pData(trial).pupilDiameterMm,...
+            validIdx = ~isnan(pData(trial).pupilDiameterMm);
+            invalidIdx = isnan(pData(trial).pupilDiameterMm);
+            iy = SGolaySmooth(pData(trial).timeMSecsRaw(validIdx), pData(trial).pupilDiameterMm(validIdx),...
                 params.sgolay_span, params.sgolay_polynomial, params.sampling_frequency,...
                 params.full_trial_length);
+            iy(invalidIdx) = NaN;
             
             % clip to params.full_trial_length
             iy = iy(1:params.full_trial_length*params.sampling_frequency);
@@ -263,7 +271,7 @@ for SubjectID=1:length(Subjects)
             saveas(gcf, outFile1, 'pdf');
             outFile2 = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '.png']);
             saveas(gcf, outFile2, 'png');
-            %close(gcf);
+            close(gcf);
         end
         
         % 4. (optional) Save the data

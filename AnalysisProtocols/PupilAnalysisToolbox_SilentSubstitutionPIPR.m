@@ -5,9 +5,10 @@ userID = strtrim(userID);
 %% SilentSubstitutionPIPR_PIPR5_5sPulse
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 params = PupilAnalysisToolbox_GetDefaultParams;
-params.StepDurSecs = 5.5;
-params.yLim = 0.8;
-params.TrialInspectorFlag = false; % trial-by-trial turned off
+params.PulseOnsetSecs = 4.75;
+params.PulseDurationSecs = 5.5;
+params.meanCenterWindow = [0 params.PulseOnsetSecs-1/params.sampling_frequency]; % In seconds
+params.TrialInspectorFlag = true; % trial-by-trial turned off
 
 % This is a list of all the subjects
 
@@ -21,17 +22,17 @@ params.TrialInspectorFlag = false; % trial-by-trial turned off
 % This is a list of only the "good" subjects (who have had their data
 %   merged and passed data quality check)
 
-% Subjects = {'MELA_0001' 'MELA_0002' ...
-%    'MELA_0038' 'MELA_0043' 'MELA_0045' ...
-%    'MELA_0049' 'MELA_0050'  ...
-%    'MELA_0053' 'MELA_0057' ...
-%    'MELA_0061' 'MELA_0062' 'MELA_0065' ...
-%    'MELA_0068' 'MELA_0069' 'MELA_0071' };
+Subjects = {'MELA_0001' 'MELA_0002' ...
+   'MELA_0038' 'MELA_0043' 'MELA_0045' ...
+   'MELA_0049' 'MELA_0050'  ...
+   'MELA_0053' 'MELA_0057' ...
+   'MELA_0061' 'MELA_0062' 'MELA_0065' ...
+   'MELA_0068' 'MELA_0069' 'MELA_0071' };
 
 % This is a subject listing that could be used to examine the data from a
 % single subject and check data quality
 
- Subjects = {'MELA_0071'}
+Subjects = {'MELA_0043'}
 
 Protocols={'SilentSubstitutionPIPR_PIPR5_5sPulse'};
 
@@ -41,7 +42,7 @@ resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/S
 newLabels = {'Background', 'PIPRBlue', 'PIPRRed'};
 oldLabels = {'SilentSubstitutionPIPRBackgroundPIPR-45s', 'SilentSubstitutionPIPRBlue-45sPositivePulse5_5s', 'SilentSubstitutionPIPRRed-45sPositivePulse5_5s'};
 Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath);
-PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params.xLim, params.yLim);
+PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% SilentSubstitutionPIPR_SS5_5sPulse
