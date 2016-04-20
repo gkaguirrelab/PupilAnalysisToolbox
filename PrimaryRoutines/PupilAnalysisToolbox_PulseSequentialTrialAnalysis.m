@@ -76,7 +76,12 @@ for SubjectID=1:length(Subjects)
     pData = rmfield(pData, 'phaseCarrier');
     pData = rmfield(pData, 'phaseEnvelope');
     pData = rmfield(pData, 'rawMmPositions');
-    pData = rmfield(pData, 'rawFickPositions');
+    try
+        pData = rmfield(pData, 'rawFickPositions');
+    end
+    try
+        pData = rmfield(pData, 'rawFickPsotions');
+    end
     pData = rmfield(pData, 'rawHelmholtzPositions');
     [pData.timeMSecsRaw] = pData.rawTimeStamps;
     pData = rmfield(pData, 'time');
