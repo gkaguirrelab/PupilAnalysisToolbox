@@ -32,7 +32,11 @@ for SubjectID=1:length(Subjects)
     fprintf('\n>>> Processing subject <strong>%s</strong>', char(Subjects(SubjectID)));
     fprintf('\n\t*** Loading and concatenating sessions for subject <strong>%s</strong>', char(Subjects(SubjectID)));
     
-    % Loop over sessions and directions for a subject and concatenate the data
+    % Loop over sessions and directions for a subject and concatenate the
+    % data. The number of sessions is currently hardcoded a 3, as we have
+    % not implemented a mechanism for detecting how many files across
+    % sessions are present.
+    
     FirstGoodSessionFlag = 1;
     for sess = 1:3
         for p = 1:length(Protocols)
@@ -43,7 +47,12 @@ for SubjectID=1:length(Subjects)
             if (not(isempty(TempData)))
                 fprintf('.'); % Notify user
                 
-                % Now remove those trials that have insufficient time points
+                % In prior analyses, this is the point at which trials
+                % would be discarded for not having a sufficient number of
+                % data points. This step is no longer performed here.
+                % Instead, we will simply set NumTrials to be equal to the
+                % total number of trials stored in TempData
+                
                 NumTrials = length(TempData);
                 
                 % Now concatenate TempData to the full Data array
@@ -95,12 +104,13 @@ for SubjectID=1:length(Subjects)
     
     fprintf('- Done.\n'); % Notify user
     
-    % Smooth, interpolate, and de-spike the data
+    % Interpolate, and de-spike the data
     fprintf('\t*** Smoothing and interpolating <strong>%g</strong> trials...  ', NumTrials); % Update user
     
     % Iterate over all the data
     for trial = 1:NumTrials
-        % Trial counter
+
+        % Trial counter feedback to user
         for j = 0:log10(trial-1)
             fprintf('\b');          % delete previous counter display
         end
@@ -114,19 +124,24 @@ for SubjectID=1:length(Subjects)
         % this and return a vector that is just from time point zero
         % onward.
         % Replace all 0 with NaN
+        
         pData(trial).pupilDiameterMm(pData(trial).pupilDiameterMm == 0) = NaN;
         pData(trial).pupilDiameterMm = pData(trial).pupilDiameterMm';
         pData(trial).timeMSecs = pData(trial).timeMSecsRaw'-pData(trial).timeMSecsRaw(1);
         pData(trial).timeMSecs = pData(trial).timeMSecs-params.StimOnsetDelay;
         
-        % smooth, interpolate, and resample the data
+        % Clip and phase-correct the data.
+        % Check  that the trial is not empty, or contains a single
+        % value. If there is trial data present, proceed.
         if ~isempty(pData(trial).timeMSecs) && (~(numel(pData(trial).timeMSecs) == 1))
-            % Fix to deal with sgolay smoothing. If the last value in the
-            % time series is NaN, we set it to be the NaN mean of the
-            % series.
+
+            % the variable iy holds the pupil diameter data that will then
+            % be manipulated.
+
             iy = pData(trial).pupilDiameterMm;
             
-            % clip to params.full_trial_length
+            % Clip the vector to correspond to the length of the full
+            % data for the trial: params.full_trial_length
             iy = iy(1:params.full_trial_length*params.sampling_frequency);
             
             % Temporarily crop to params.final_trial_length to allow corrections of
@@ -149,7 +164,8 @@ for SubjectID=1:length(Subjects)
             pData(trial).timeSecs = linspace(0, params.minimum_trial_length-(1/params.sampling_frequency), params.minimum_trial_length*params.sampling_frequency);
             pData(trial).timeMSecs = 1000*pData(trial).timeSecs;
             pData(trial).pupilDiameterMm = tmp(1:length(pData(trial).timeSecs));
-        else
+        else % The trial is full of NaNs or has a single value. Manufacture
+             % a place-holder trial of the appropriate length that is all NaNs
             pData(trial).timeSecs = linspace(0, params.minimum_trial_length-(1/params.sampling_frequency), params.minimum_trial_length*params.sampling_frequency);
             pData(trial).timeMSecs = 1000*pData(trial).timeSecs;
             pData(trial).pupilDiameterMm = NaN*ones(size(pData(trial).timeSecs));
@@ -159,9 +175,12 @@ for SubjectID=1:length(Subjects)
     
     %% Data quality: Spike removing, making sure we have enough data points, ...
     fprintf('\t*** De-spiking and mean-centering <strong>%g</strong> trials... ', NumTrials); % Update user
+ 
+    % EXPLAIN WHAT THIS VARIABLE IS
     meanCenterWindowIdx = find((pData(trial).timeSecs >= params.meanCenterWindow(1)) & (pData(trial).timeSecs <= params.meanCenterWindow(2)));
+
     for trial = 1:NumTrials
-        % Trial counter
+        % Trial counter information for the user
         for j=0:log10(trial-1)
             fprintf('\b');          % delete previous counter display
         end
@@ -176,7 +195,7 @@ for SubjectID=1:length(Subjects)
         % 2. Get the indices from the spikes
         [~, pData(trial).removePoints] = PupilAnalysisToolbox_SpikeRemover(pData(trial).pupilDiameterMmMeanCentered, params);
         
-        % 3. Remove the spikes from the original data
+        % 3. Remove the spikes from the original data (set them to NaN)
         pData(trial).pupilDiameterMmDespiked = pData(trial).pupilDiameterMm;
         pData(trial).pupilDiameterMmDespiked(pData(trial).removePoints) = NaN;
         
