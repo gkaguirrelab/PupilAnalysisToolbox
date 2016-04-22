@@ -312,11 +312,11 @@ for SubjectID=1:length(Subjects)
             end
             
         else % There were no good trials, return NaNs
-            ReturnData(SubjectID, dd).timeSecs = linspace(0, params.minimum_trial_length-(1/params.sampling_frequency), params.minimum_trial_length*params.sampling_frequency);
-            ReturnData(SubjectID, dd).TimeSeries = NaN*ones(size(pData(trial).timeSecs));
+            ReturnData(SubjectID, dd).timeSecs = linspace(0, params.minimum_trial_length-(1/params.sampling_frequency), params.minimum_trial_length*params.sampling_frequency)';
+            ReturnData(SubjectID, dd).TimeSeries = NaN*ones(size(pData(trial).timeSecs))';
             ReturnData(SubjectID, dd).Mean = NaN;
-            ReturnData(SubjectID, dd).AvgTimeSeries = NaN*ones(size(pData(trial).timeSecs));
-            ReturnData(SubjectID, dd).SEMTimeSeries = NaN*ones(size(pData(trial).timeSecs));
+            ReturnData(SubjectID, dd).AvgTimeSeries = NaN*ones(size(pData(trial).timeSecs))';
+            ReturnData(SubjectID, dd).SEMTimeSeries = NaN*ones(size(pData(trial).timeSecs))';
         end
         
     end
