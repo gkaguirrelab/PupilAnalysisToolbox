@@ -109,7 +109,7 @@ for SubjectID=1:length(Subjects)
     
     % Iterate over all the data
     for trial = 1:NumTrials
-
+        
         % Trial counter feedback to user
         for j = 0:log10(trial-1)
             fprintf('\b');          % delete previous counter display
@@ -134,10 +134,10 @@ for SubjectID=1:length(Subjects)
         % Check  that the trial is not empty, or contains a single
         % value. If there is trial data present, proceed.
         if ~isempty(pData(trial).timeMSecs) && (~(numel(pData(trial).timeMSecs) == 1))
-
+            
             % the variable iy holds the pupil diameter data that will then
             % be manipulated.
-
+            
             iy = pData(trial).pupilDiameterMm;
             
             % Clip the vector to correspond to the length of the full
@@ -165,7 +165,7 @@ for SubjectID=1:length(Subjects)
             pData(trial).timeMSecs = 1000*pData(trial).timeSecs;
             pData(trial).pupilDiameterMm = tmp(1:length(pData(trial).timeSecs));
         else % The trial is full of NaNs or has a single value. Manufacture
-             % a place-holder trial of the appropriate length that is all NaNs
+            % a place-holder trial of the appropriate length that is all NaNs
             pData(trial).timeSecs = linspace(0, params.minimum_trial_length-(1/params.sampling_frequency), params.minimum_trial_length*params.sampling_frequency);
             pData(trial).timeMSecs = 1000*pData(trial).timeSecs;
             pData(trial).pupilDiameterMm = NaN*ones(size(pData(trial).timeSecs));
@@ -175,10 +175,10 @@ for SubjectID=1:length(Subjects)
     
     %% Data quality: Spike removing, making sure we have enough data points, ...
     fprintf('\t*** De-spiking and mean-centering <strong>%g</strong> trials... ', NumTrials); % Update user
- 
-    % EXPLAIN WHAT THIS VARIABLE IS
+    
+    % Window to be used to calculate where to set zero on the y-axis
     meanCenterWindowIdx = find((pData(trial).timeSecs >= params.meanCenterWindow(1)) & (pData(trial).timeSecs <= params.meanCenterWindow(2)));
-
+    
     for trial = 1:NumTrials
         % Trial counter information for the user
         for j=0:log10(trial-1)
@@ -265,46 +265,59 @@ for SubjectID=1:length(Subjects)
     
     %% Calculate averages
     for dd = 1:length(newLabels)
-        % 1. Assemble the data
+        
+        % Identify good trials for this modulation, check if there are any
         ind = find(ismember({pData.direction}, newLabels{dd}) & [pData.dataQualityPass]);
-        ReturnData(SubjectID, dd).label = newLabels{dd};
-        ReturnData(SubjectID, dd).timeSecs = pData(ind(1)).timeSecs-params.PulseOnsetSecs';
-        ReturnData(SubjectID, dd).TimeSeries = cell2mat({pData(ind).pupilDiameterMmMeanCentered}')';
-        ReturnData(SubjectID, dd).Mean = [pData(ind).meanBaseline];
-        ReturnData(SubjectID, dd).AvgTimeSeries = nanmean(ReturnData(SubjectID, dd).TimeSeries, 2);
-        ReturnData(SubjectID, dd).SEMTimeSeries = nanstd(ReturnData(SubjectID, dd).TimeSeries, [], 2) / sqrt(size(ReturnData(SubjectID, dd).TimeSeries, 2));
-        
-        % 2. Plot the data
-        plot([-params.PulseOnsetSecs params.xLim], [0 0], '-', 'Color', [0.3 0.3 0.3]); hold on;
-        shadedErrorBar(ReturnData(SubjectID, dd).timeSecs, ReturnData(SubjectID, dd).AvgTimeSeries, ...
-            ReturnData(SubjectID, dd).SEMTimeSeries);
-        plot([0 params.PulseDurationSecs], [0.1 0.1], '-r', 'LineWidth', 2);
-        pbaspect([1 1 1]);
-        xlim([-params.PulseOnsetSecs params.xLim]); ylim([-params.yLim params.yLim]);
-        xlabel('Time [Secs]'); ylabel('Pupil diameter [change]');
-        pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off;
-        title({newLabels{dd} ['Mean\pm1SEM (n = ' num2str(length(ind)) ' trials)']});
-        
-        % 3. Save the plot
-        if params.SavePlotFlag
-            % Save out the plot
-            set(gca, 'TickDir', 'out');
-            set(gcf, 'PaperPosition', [0 0 4 4]); %Position plot at left hand corner with width 4 and height 4.
-            set(gcf, 'PaperSize', [4 4]); %Set the paper to have width 4 and height 4.
-            outFile1 = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '.pdf']);
-            saveas(gcf, outFile1, 'pdf');
-            outFile2 = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '.png']);
-            saveas(gcf, outFile2, 'png');
-            close(gcf);
+        if ~(isempty(ind))
+            
+            % 1. Assemble the data            
+            ReturnData(SubjectID, dd).label = newLabels{dd};
+            ReturnData(SubjectID, dd).timeSecs = pData(ind(1)).timeSecs-params.PulseOnsetSecs';
+            ReturnData(SubjectID, dd).TimeSeries = cell2mat({pData(ind).pupilDiameterMmMeanCentered}')';
+            ReturnData(SubjectID, dd).Mean = [pData(ind).meanBaseline];
+            ReturnData(SubjectID, dd).AvgTimeSeries = nanmean(ReturnData(SubjectID, dd).TimeSeries, 2);
+            ReturnData(SubjectID, dd).SEMTimeSeries = nanstd(ReturnData(SubjectID, dd).TimeSeries, [], 2) / sqrt(size(ReturnData(SubjectID, dd).TimeSeries, 2));
+            
+            % 2. Plot the data
+            plot([-params.PulseOnsetSecs params.xLim], [0 0], '-', 'Color', [0.3 0.3 0.3]); hold on;
+            shadedErrorBar(ReturnData(SubjectID, dd).timeSecs, ReturnData(SubjectID, dd).AvgTimeSeries, ...
+                ReturnData(SubjectID, dd).SEMTimeSeries);
+            plot([0 params.PulseDurationSecs], [0.1 0.1], '-r', 'LineWidth', 2);
+            pbaspect([1 1 1]);
+            xlim([-params.PulseOnsetSecs params.xLim]); ylim([-params.yLim params.yLim]);
+            xlabel('Time [Secs]'); ylabel('Pupil diameter [change]');
+            pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off;
+            title({newLabels{dd} ['Mean\pm1SEM (n = ' num2str(length(ind)) ' trials)']});
+            
+            % 3. Save the plot
+            if params.SavePlotFlag
+                % Save out the plot
+                set(gca, 'TickDir', 'out');
+                set(gcf, 'PaperPosition', [0 0 4 4]); %Position plot at left hand corner with width 4 and height 4.
+                set(gcf, 'PaperSize', [4 4]); %Set the paper to have width 4 and height 4.
+                outFile1 = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '.pdf']);
+                saveas(gcf, outFile1, 'pdf');
+                outFile2 = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '.png']);
+                saveas(gcf, outFile2, 'png');
+                close(gcf);
+            end
+            
+            % 4. (optional) Save the data
+            if params.SaveDataFlag
+                % Save out mean pupil size
+                outFile = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '_TimeSeries.csv']);
+                csvwrite(outFile, ReturnData(SubjectID, dd).TimeSeries);
+                outFile = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '_Mean.csv']);
+                csvwrite(outFile, ReturnData(SubjectID, dd).Mean);
+            end
+            
+        else % There were no good trials, return NaNs
+            ReturnData(SubjectID, dd).timeSecs = linspace(0, params.minimum_trial_length-(1/params.sampling_frequency), params.minimum_trial_length*params.sampling_frequency);
+            ReturnData(SubjectID, dd).TimeSeries = NaN*ones(size(pData(trial).timeSecs));
+            ReturnData(SubjectID, dd).Mean = NaN;
+            ReturnData(SubjectID, dd).AvgTimeSeries = NaN*ones(size(pData(trial).timeSecs));
+            ReturnData(SubjectID, dd).SEMTimeSeries = NaN*ones(size(pData(trial).timeSecs));
         end
         
-        % 4. (optional) Save the data
-        if params.SaveDataFlag
-            % Save out mean pupil size
-            outFile = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '_TimeSeries.csv']);
-            csvwrite(outFile, ReturnData(SubjectID, dd).TimeSeries);
-            outFile = fullfile(fullResultsPath, [char(Subjects(SubjectID)) '_PupilPulseData_' newLabels{dd} '_Mean.csv']);
-            csvwrite(outFile, ReturnData(SubjectID, dd).Mean);
-        end
     end
 end
