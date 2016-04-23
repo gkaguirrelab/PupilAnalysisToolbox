@@ -39,7 +39,7 @@ shadedErrorBar(linspace(1,size(trialProportionMissingData,2),size(trialProportio
     mean(trialProportionMissingData, 1), ...
     std(trialProportionMissingData, 1)/sqrt(length(Subjects)));
 pbaspect([1 1 1]);
-xlabel('Trial number'); ylabel('Proportion missing data');
+xlabel('Trial number'); ylabel('Proportion of trial missing data');
 xlim([0 size(trialProportionMissingData,2)]); ylim([0 1]); 
 
 title({['Mean\pm1SEM (n = ' num2str(length(Subjects)) ' subjects)']});
