@@ -318,6 +318,6 @@ for SubjectID=1:length(Subjects)
             ReturnData(SubjectID, dd).AvgTimeSeries = NaN*ones(size(pData(trial).timeSecs))';
             ReturnData(SubjectID, dd).SEMTimeSeries = NaN*ones(size(pData(trial).timeSecs))';
         end
-        
     end
+
 end
