@@ -1,6 +1,24 @@
 function PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params, comparisonsIdx, comparisonsPolarity)
 % PupilAnalysisToolbox_PlotTimeSeriesAndMean(Data, Subjects, resultsPath, params)
 
+averagesPath = '/Averages';
+
+%% Create a director for this output, if it does not already exist
+if ~exist(fullfile(resultsPath, averagesPath), 'dir');
+    mkdir(fullfile(resultsPath, averagesPath));
+end
+
+
+%% Save the list of analyzed subjects
+outFile = fullfile(resultsPath, averagesPath, 'subjectListforAverages.csv');
+fid = fopen(outFile, 'w');
+fprintf(fid, 'Subjects included in average plots:\n\n');
+for s = 1:length(Subjects)
+    fprintf(fid, [char(Subjects(s)),'\n']);
+end
+fclose(fid);
+
+
 %% Plot the averages
 for dd = 1:size(Data, 2)
     figure;
@@ -17,9 +35,9 @@ for dd = 1:size(Data, 2)
     set(gca, 'TickDir', 'out');
     set(gcf, 'PaperPosition', [0 0 4 4]); %Position plot at left hand corner with width 4 and height 4.
     set(gcf, 'PaperSize', [4 4]); %Set the paper to have width 4 and height 4.
-    outFile1 = fullfile(resultsPath, ['TimeSeries_' strrep(Data(1, dd).label, '_', ' ') '.pdf']);
+    outFile1 = fullfile(resultsPath, averagesPath, ['TimeSeries_' strrep(Data(1, dd).label, '_', ' ') '.pdf']);
     saveas(gcf, outFile1, 'pdf');
-    outFile2 = fullfile(resultsPath, ['TimeSeries_' strrep(Data(1, dd).label, '_', ' ') '.png']);
+    outFile2 = fullfile(resultsPath, averagesPath, ['TimeSeries_' strrep(Data(1, dd).label, '_', ' ') '.png']);
     saveas(gcf, outFile2, 'png');
     close(gcf);
 end
@@ -40,8 +58,8 @@ for ii = 1:length(comparisonsIdx)
     set(gca, 'TickDir', 'out');
     set(gcf, 'PaperPosition', [0 0 4 4]); %Position plot at left hand corner with width 15 and height 6.
     set(gcf, 'PaperSize', [4 4]); %Set the paper to have width 15 and height 6.
-    outFile1 = fullfile(resultsPath, ['TimeSeries_' strrep(Data(2, comparisonsIdx{ii}(1)).label, '_', ' ') '-' strrep(Data(3, comparisonsIdx{ii}(2)).label, '_', ' ') '.pdf']);
-    outFile2 = fullfile(resultsPath, ['TimeSeries_' strrep(Data(2, comparisonsIdx{ii}(1)).label, '_', ' ') '-' strrep(Data(3, comparisonsIdx{ii}(2)).label, '_', ' ') '.png']);
+    outFile1 = fullfile(resultsPath, averagesPath, ['TimeSeries_' strrep(Data(2, comparisonsIdx{ii}(1)).label, '_', ' ') '-' strrep(Data(3, comparisonsIdx{ii}(2)).label, '_', ' ') '.pdf']);
+    outFile2 = fullfile(resultsPath, averagesPath, ['TimeSeries_' strrep(Data(2, comparisonsIdx{ii}(1)).label, '_', ' ') '-' strrep(Data(3, comparisonsIdx{ii}(2)).label, '_', ' ') '.png']);
     saveas(gcf, outFile1, 'pdf');
     saveas(gcf, outFile2, 'png');
     close(gcf);
