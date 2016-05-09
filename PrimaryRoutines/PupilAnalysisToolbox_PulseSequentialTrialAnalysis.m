@@ -214,7 +214,19 @@ for SubjectID=1:length(Subjects)
             size(pData(trial).pupilDiameterMm, 1), 1)) ./ repmat(pData(trial).meanBaseline, ...
             size(pData(trial).pupilDiameterMm, 1), 1));
         
-        % 6. (optional) Display the trial and the removed points
+        % 6. Relabel the direction name
+        labelIdx = find(ismember(oldLabels, pData(trial).direction));
+        pData(trial).direction = newLabels{labelIdx};
+        
+        % 7. Determine the proportion of missing data points
+        pData(trial).propMissingData = sum(theNans)/length(pData(trial).pupilDiameterMmDespiked);
+        if pData(trial).propMissingData > params.BadNaNThreshold
+            pData(trial).dataQualityPass = 0;
+        else
+            pData(trial).dataQualityPass = 1;
+        end
+        
+        % 8. (optional) Display the trial and the removed points
         if (params.TrialInspectorFlag == 1)
             figure(figTrialInspector); hold off;
             plot(pData(trial).timeSecs, pData(trial).pupilDiameterMm, '-r'); hold on;
@@ -222,20 +234,12 @@ for SubjectID=1:length(Subjects)
             xlabel('Time [Secs]'); ylabel('Pupil diameter [mm]');
             xlim([0 params.final_trial_length]); ylim([2 9]);
             pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off;
-            title(['Trial ' num2str(trial)]);
+            if pData(trial).dataQualityPass == 1
+                title({['Trial ' num2str(trial)] 'PASS'});
+            else
+                title({['Trial ' num2str(trial)] 'REJECT'});
+            end
             pause;
-        end
-        
-        % 7. Relabel the direction name
-        labelIdx = find(ismember(oldLabels, pData(trial).direction));
-        pData(trial).direction = newLabels{labelIdx};
-        
-        % 8. Determine the proportion of missing data points
-        pData(trial).propMissingData = sum(theNans)/length(pData(trial).pupilDiameterMmDespiked);
-        if pData(trial).propMissingData > params.BadNaNThreshold
-            pData(trial).dataQualityPass = 0;
-        else
-            pData(trial).dataQualityPass = 1;
         end
     end
     fprintf('. - Done.\n'); % notify user we are done the loop
@@ -270,7 +274,7 @@ for SubjectID=1:length(Subjects)
         ind = find(ismember({pData.direction}, newLabels{dd}) & [pData.dataQualityPass]);
         if ~(isempty(ind))
             
-            % 1. Assemble the data            
+            % 1. Assemble the data
             ReturnData(SubjectID, dd).label = newLabels{dd};
             ReturnData(SubjectID, dd).timeSecs = pData(ind(1)).timeSecs-params.PulseOnsetSecs';
             ReturnData(SubjectID, dd).TimeSeries = cell2mat({pData(ind).pupilDiameterMmMeanCentered}')';
@@ -320,5 +324,5 @@ for SubjectID=1:length(Subjects)
             ReturnData(SubjectID, dd).SEMTimeSeries = NaN*ones(size(pData(trial).timeSecs))';
         end
     end
-
+    
 end
