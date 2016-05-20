@@ -100,10 +100,14 @@ for SubjectID=1:length(Subjects)
     [pData.pupilDiameterMm] = pData.rawPupilDiameter;
     pData = rmfield(pData, 'diameter');
     pData = rmfield(pData, 'rawPupilDiameter');
+        
+    %% Remove the first six trials as they are background adaptation
+    pData(1:6) = [];
+    rData(1:6) = [];
     NumTrials = length(pData);
     
     fprintf('- Done.\n'); % Notify user
-    
+
     % Interpolate, and de-spike the data
     fprintf('\t*** Smoothing and interpolating <strong>%g</strong> trials...  ', NumTrials); % Update user
     
