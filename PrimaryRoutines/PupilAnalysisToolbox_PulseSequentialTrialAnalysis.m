@@ -239,9 +239,9 @@ for SubjectID=1:length(Subjects)
             xlim([0 params.final_trial_length]); ylim([2 9]);
             pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off;
             if pData(trial).dataQualityPass == 1
-                title({['Trial ' num2str(trial)] 'PASS'});
+                title({['Trial ' num2str(trial)] 'PASS' num2str(100*pData(trial).propMissingData)});
             else
-                title({['Trial ' num2str(trial)] 'REJECT'});
+                title({['Trial ' num2str(trial)] 'REJECT' num2str(100*pData(trial).propMissingData)});
             end
             pause;
         end

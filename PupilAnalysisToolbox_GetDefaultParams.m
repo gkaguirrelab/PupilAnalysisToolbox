@@ -41,7 +41,7 @@ p.addOptional('VelocityBlinkDetectionFlag', true, @islogical);
 p.addOptional('VelocityOnsetThreshold', -0.05, @isscalar);
 p.addOptional('VelocityOffsetThreshold', 0.05, @isscalar);
 p.addOptional('VelocitySearchWindowSize', 10, @isscalar);
-p.addOptional('VelocityMarginWindowSize', 30, @isscalar);
+p.addOptional('VelocityMarginWindowSize', 10, @isscalar);
 p.addOptional('VelocitySmoothingParam', 5, @isscalar);
 
 p.addOptional('sgolay_span', 40, @isscalar); % Parameters of the SGolay interpolation prior to interpolation

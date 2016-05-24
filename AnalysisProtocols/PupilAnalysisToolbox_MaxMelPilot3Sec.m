@@ -11,7 +11,7 @@ params.meanCenterWindow = [0 params.PulseOnsetSecs-1/params.sampling_frequency];
 params.TrialInspectorFlag = false;
 
 Protocols={'MelanopsinMRPupil_MaxLMS400Pct3sPulse'};
-Subjects = {'HERO_gka1'};
+Subjects = {'HERO_mxs1'};
 
 basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/MelanopsinMRPupil_MaxLMS400Pct3sPulse'];
 resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/MelanopsinMRPupil_MaxLMS400Pct3sPulse'];
@@ -34,7 +34,7 @@ params.meanCenterWindow = [0 params.PulseOnsetSecs-1/params.sampling_frequency];
 params.TrialInspectorFlag = false;
 
 Protocols={'MelanopsinMRPupil_MaxMel400Pct3sPulse'};
-Subjects = {'HERO_gka1'};
+Subjects = {'HERO_mxs1'};
 
 basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/MelanopsinMRPupil_MaxMel400Pct3sPulse'];
 resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/MelanopsinMRPupil_MaxMel400Pct3sPulse'];
