@@ -1,4 +1,4 @@
-function ReturnData = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath)
+function ReturnData = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Dates, Protocols, newLabels, oldLabels, basePath, resultsPath)
 % PulseSequentialTrialAnalysis(params, Subjects, Protocols, newLabels, oldLabels, basePath, resultsPath)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -42,7 +42,7 @@ for SubjectID=1:length(Subjects)
         for p = 1:length(Protocols)
             % Load data set
             [TempData,TempTrialFrequencies,TempTrialPhases,TempTrialDirections,TempTrialContrasts,TempAlphaSpacing,TempDateTime]=...
-                PupilAnalysisToolbox_LoadData(basePath, char(Protocols(p)),char(Subjects(SubjectID)),sess);
+                PupilAnalysisToolbox_LoadData(basePath, char(Protocols(p)),char(Subjects(SubjectID)),char(Dates(SubjectID)),sess);
             
             if (not(isempty(TempData)))
                 fprintf('.'); % Notify user

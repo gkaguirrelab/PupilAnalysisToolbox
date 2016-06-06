@@ -1,4 +1,4 @@
-function [Data,TrialFrequencies,TrialPhases,TrialDirections,TrialContrasts,timeStepStim,DateTime] = PupilAnalysisToolbox_LoadData(basePath, Protocol,Subject,Session)
+function [Data,TrialFrequencies,TrialPhases,TrialDirections,TrialContrasts,timeStepStim,DateTime] = PupilAnalysisToolbox_LoadData(basePath, Protocol,Subject,Date,Session)
 
 % Extract the data path directly from this file.
 
@@ -17,7 +17,7 @@ function [Data,TrialFrequencies,TrialPhases,TrialDirections,TrialContrasts,timeS
 
 %dataDirStem = ['/Users/Shared/Matlab/experiments/OneLight/OLPupilDiameter/data/'];
 
-dataDir = fullfile(basePath, Subject);
+dataDir = fullfile(basePath, Subject, Date, 'MatFiles');
 inputFile = [Subject '-' Protocol '-' num2str(Session) '.mat'];
 
 if (exist(fullfile(dataDir, inputFile),'file')==2)
