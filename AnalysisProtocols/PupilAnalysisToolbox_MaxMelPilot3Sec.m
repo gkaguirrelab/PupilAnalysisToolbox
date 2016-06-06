@@ -34,7 +34,7 @@ params.meanCenterWindow = [0 params.PulseOnsetSecs-1/params.sampling_frequency];
 params.TrialInspectorFlag = false;
 
 Protocols={'MelanopsinMRPupil_MaxMel400Pct3sPulse'};
-Subjects = {'HERO_mxs1'};
+Subjects = {'HERO_asb1' 'HERO_aso1' 'HERO_gka1' 'HERO_mxs1'};
 Dates = {'052616' '052716' '052416' '052416'};
 
 basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/MelanopsinMRPupil_MaxMel400Pct3sPulse'];
