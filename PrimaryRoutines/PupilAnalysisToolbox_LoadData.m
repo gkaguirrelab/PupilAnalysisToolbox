@@ -18,7 +18,7 @@ function [Data,TrialFrequencies,TrialPhases,TrialDirections,TrialContrasts,timeS
 %dataDirStem = ['/Users/Shared/Matlab/experiments/OneLight/OLPupilDiameter/data/'];
 
 dataDir = fullfile(basePath, Subject, Date, 'MatFiles');
-inputFile = [Subject '-' Protocol '-' num2str(Session) '.mat'];
+inputFile = [Subject '-' Protocol '-' num2str(Session, '%02.f') '.mat'];
 
 if (exist(fullfile(dataDir, inputFile),'file')==2)
     

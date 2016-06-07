@@ -101,9 +101,9 @@ for SubjectID=1:length(Subjects)
     pData = rmfield(pData, 'diameter');
     pData = rmfield(pData, 'rawPupilDiameter');
         
-    %% Remove the first six trials as they are background adaptation
-    pData(1:6) = [];
-    rData(1:6) = [];
+    %% Remove the first 5 trials as they are background adaptation
+    pData(1:5) = [];
+    rData(1:5) = [];
     NumTrials = length(pData);
     
     fprintf('- Done.\n'); % Notify user
@@ -155,10 +155,9 @@ for SubjectID=1:length(Subjects)
             if (params.final_trial_length > params.full_trial_length)
                 error('params.final_trial_length must be less than or equal to params.full_trial_length')
             end
-            iy = iy((params.full_trial_length-params.final_trial_length)*params.sampling_frequency+1:params.full_trial_length*params.sampling_frequency);
             
             % Align to zero stimulus phase.
-            AmountToShift= pData(trial).phaseRandSec*...  % Length of stimulus cycle in seconds
+            AmountToShift = pData(trial).phaseRandSec*...  % Length of stimulus cycle in seconds
                 params.sampling_frequency*...;  % number of data samples per second
                 (1);    % we need to phase advance
             orig_iy = iy;
