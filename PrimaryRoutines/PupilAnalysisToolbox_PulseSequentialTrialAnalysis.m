@@ -38,7 +38,7 @@ for SubjectID=1:length(Subjects)
     % sessions are present.
     
     FirstGoodSessionFlag = 1;
-    for sess = 1:3
+    for sess = 1:5
         for p = 1:length(Protocols)
             % Load data set
             [TempData,TempTrialFrequencies,TempTrialPhases,TempTrialDirections,TempTrialContrasts,TempAlphaSpacing,TempDateTime]=...
@@ -102,8 +102,12 @@ for SubjectID=1:length(Subjects)
     pData = rmfield(pData, 'rawPupilDiameter');
         
     %% Remove the first 5 trials as they are background adaptation
-    pData(1:5) = [];
-    rData(1:5) = [];
+    
+    % This needs a parameter setting to adjust depending on the
+    % implementation.
+    
+%    pData(1:5) = [];
+%    rData(1:5) = [];
     NumTrials = length(pData);
     
     fprintf('- Done.\n'); % Notify user
