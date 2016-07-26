@@ -16,10 +16,9 @@ params.minimum_trial_length = 14;
 params.xLim = 14;
 Protocols={'PIPRMaxPulse_PulsePIPR_Screening'};
 Subjects = {'TEST_0003'};
-Dates = {'071316'};
+%Dates = {'071316'};
 basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/PIPRMaxPulse_PulsePIPR_Screening'];
 resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/PIPRMaxPulse_PulsePIPR_Screening'];
-newLabels = {'PIPRBlue', 'PIPRRed', 'PIPRRed'};
-oldLabels = {'PIPRMaxPulse-PulsePIPRBlue_3s_MaxContrast17sSegment', 'PIPRMaxPulse-PulsePIPRRed_3s_MaxContrast17sSegment', 'PIPRMaxPulse-PulsePIPRred_3s_MaxContrast17sSegment'};
+newLabels = {'PIPRBlue', 'PIPRRed'};
+oldLabels = {'PIPRMaxPulse-PulsePIPRBlue_3s_MaxContrast17sSegment', 'PIPRMaxPulse-PulsePIPRRed_3s_MaxContrast17sSegment'};
 Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Dates, Protocols, newLabels, oldLabels, basePath, resultsPath);
-
