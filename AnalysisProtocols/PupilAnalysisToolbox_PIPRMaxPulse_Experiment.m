@@ -4,8 +4,8 @@ userID = strtrim(userID);
 
 %% List of all the subjects and dates
 
-Subjects = {'TEST_0004'};
-Dates = {'072616'};
+Subjects = {'TEST_0005'};
+Dates = {'072716'};
 
 %% Params common to all components of the experiment
 
@@ -22,19 +22,16 @@ params.xLim = 14;
 
 % Stimulus labels
 
-oldLabels = {'PIPRMaxPulse-PulsePIPRBlue_3s_MaxContrast17sSegment',...
-             'PIPRMaxPulse-PulsePIPRred_3s_MaxContrast17sSegment',...
-             'PIPRMaxPulse-PulsePIPRRed_3s_MaxContrast17sSegment',...
-             'PIPRMaxPulse-BackgroundPIPR_45sSegment',...
-             'PIPRMaxPulse-PulseMaxLMS_3s_MaxContrast17sSegment',...
-             'PIPRMaxPulse-BackgroundLMS_45sSegment',...
-             'PIPRMaxPulse-PulseMaxMel_3s_MaxContrast17sSegment',...
-             'PIPRMaxPulse-BackgroundMel_45sSegment'};
-newLabels = {'PIPRBlue', 'PIPRRed', 'PIPRRed', 'Background', 'MaxLMS', 'Background', 'MaxMel', 'Background'};
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% PIPRMaxPulse_PulsePIPR
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+oldLabels = {'PIPRMaxPulse-PulsePIPRBlue_3s_MaxContrast17sSegment',...
+             'PIPRMaxPulse-PulsePIPRRed_3s_MaxContrast17sSegment',...
+             'PIPRMaxPulse-PulsePIPRred_3s_MaxContrast17sSegment',...
+             'PIPRMaxPulse-BackgroundPIPR_45sSegment'};
+newLabels = {'PIPRBlue', 'PIPRRed', 'PIPRRed', 'Background'};
 
 Protocol={'PIPRMaxPulse_PulsePIPR'};
 basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/' Protocol{1}];
@@ -45,6 +42,10 @@ Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Dates
 %% PIPRMaxPulse_PulseLMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+oldLabels = {'PIPRMaxPulse-PulseMaxLMS_3s_MaxContrast17sSegment',...
+             'PIPRMaxPulse-BackgroundLMS_45sSegment'};
+newLabels = {'MaxLMS', 'Background'};
+
 Protocol={'PIPRMaxPulse_PulseLMS'};
 basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/' Protocol{1}];
 resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/' Protocol{1}];
@@ -53,6 +54,10 @@ Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Dates
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% PIPRMaxPulse_PulseLMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+oldLabels = {'PIPRMaxPulse-PulseMaxMel_3s_MaxContrast17sSegment',...
+             'PIPRMaxPulse-BackgroundMel_45sSegment'};
+newLabels = {'MaxMel', 'Background'};
 
 Protocol={'PIPRMaxPulse_PulseMel'};
 basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/' Protocol{1}];
