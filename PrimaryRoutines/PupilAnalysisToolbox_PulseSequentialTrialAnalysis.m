@@ -65,7 +65,19 @@ for SubjectID=1:length(Subjects)
                         rData(trial).direction = [tmp0{2} '-' tmp0{3}];
                     end
                 else
-                    endIdx = size(rData, 1);
+                    
+                    % On August 9, 2016, gka switched the row-column order
+                    % of the size function for the check on rData. At some
+                    % point prior to this date, the row-column order of the
+                    % rData variable was switched, causing the aggregation
+                    % of data from across sessions to not work. The change
+                    % of the code from "size(rData,1)" to "size(rData,2)"
+                    % fixed this problem. Future Geoff, you may reach this
+                    % comment when you are trying to analyze old pupil data
+                    % and discover that the aggregation of data from across
+                    % sessions is not working.
+                    
+                    endIdx = size(rData, 2);
                     rData(endIdx+1:endIdx+NumTrials) = TempData(1:end);
                     for trial = 1:NumTrials
                         % Assign the direction label
