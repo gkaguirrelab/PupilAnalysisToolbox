@@ -4,8 +4,8 @@ userID = strtrim(userID);
 
 %% List of all the subjects and dates
 
-Subjects = {'TEST_0005'};
-Dates = {'072716'};
+Subjects = {'MELA_0039' 'MELA_0074'};
+Dates = {'092716' '092716'};
 
 %% Params common to all components of the experiment
 
@@ -19,9 +19,9 @@ params.full_trial_length = 17;
 params.final_trial_length = 14;
 params.minimum_trial_length = 14;
 params.xLim = 14;
+params.yLim = 0.7;
 
 % Stimulus labels
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% PIPRMaxPulse_PulsePIPR
