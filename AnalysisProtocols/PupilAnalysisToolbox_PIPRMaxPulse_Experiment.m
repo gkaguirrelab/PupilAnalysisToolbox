@@ -14,7 +14,7 @@ params.BadNaNThreshold = 0.5;
 params.PulseOnsetSecs = 1;
 params.PulseDurationSecs = 3;
 params.meanCenterWindow = [0 1-1/params.sampling_frequency]; % In seconds
-params.TrialInspectorFlag = false;
+params.TrialInspectorFlag = true;
 params.full_trial_length = 17;
 params.final_trial_length = 14;
 params.minimum_trial_length = 14;
@@ -28,10 +28,9 @@ params.yLim = 0.7;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 oldLabels = {'PIPRMaxPulse-PulsePIPRBlue_3s_MaxContrast17sSegment',...
-             'PIPRMaxPulse-PulsePIPRRed_3s_MaxContrast17sSegment',...
              'PIPRMaxPulse-PulsePIPRred_3s_MaxContrast17sSegment',...
              'PIPRMaxPulse-BackgroundPIPR_45sSegment'};
-newLabels = {'PIPRBlue', 'PIPRRed', 'PIPRRed', 'Background'};
+newLabels = {'PIPRBlue', 'PIPRRed', 'Background'};
 
 Protocol={'PIPRMaxPulse_PulsePIPR'};
 basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/' Protocol{1}];
