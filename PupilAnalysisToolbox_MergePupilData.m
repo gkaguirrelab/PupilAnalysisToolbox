@@ -111,5 +111,5 @@ end
 
 params.dataStruct = dataStructNew;
 params.mergeState = true;
-save(fullfile(thePath, theFile), 'params', 'exp', 'svnInfo');
+save(fullfile(thePath, theFile), 'params', 'exp');
 fprintf('*** All merging finished.\n');
