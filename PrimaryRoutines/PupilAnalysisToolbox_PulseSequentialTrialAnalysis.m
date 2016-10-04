@@ -234,7 +234,7 @@ for SubjectID=1:length(Subjects)
             size(pData(trial).pupilDiameterMm, 1), 1));
         
         % 6. Relabel the direction name
-        labelIdx = find(ismember(oldLabels, pData(trial).direction));
+        labelIdx = find(ismember(lower(oldLabels), lower(pData(trial).direction)));
         pData(trial).direction = newLabels{labelIdx};
         
         % 7. Determine the proportion of missing data points
