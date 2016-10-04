@@ -4,8 +4,8 @@ userID = strtrim(userID);
 
 %% List of all the subjects and dates
 
-Subjects = {'MELA_0038'};
-Dates = {'092916'};
+Subjects = {'MELA_0078'};
+Dates = {'100416'};
 
 %% Params common to all components of the experiment
 
