@@ -4,13 +4,13 @@ userID = strtrim(userID);
 
 %% List of all the subjects and dates
 % Master list
-Subjects = {'MELA_0039' 'MELA_0074' 'MELA_00043' 'MELA_0038' 'MELA_0078'};
+Subjects = {'MELA_0039' 'MELA_0074' 'MELA_0043' 'MELA_0038' 'MELA_0078'};
 Dates = {'092716' '092716' '092816' '092916' '100416'};
 %%% DO NOT CHANGE THIS LIST APART FROM ADDING THE MOST RECENT SUBJECTS
 
 %% Change the below
-%Subjects = {'MELA_0078'};
-%Dates = {'100416'};
+Subjects = {'MELA_0078'};
+Dates = {'100416'};
 
 %% Params common to all components of the experiment
 
