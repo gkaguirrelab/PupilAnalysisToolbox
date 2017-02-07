@@ -23,7 +23,7 @@ for SubjectID=1:length(Subjects)
     end
     
     % Create the results path
-    fullResultsPath = fullfile(resultsPath, char(Subjects(SubjectID)));
+    fullResultsPath = fullfile(resultsPath, char(Subjects(SubjectID)), char(Dates(SubjectID)));
     if ~exist(fullResultsPath, 'dir');
         mkdir(fullResultsPath);
     end
