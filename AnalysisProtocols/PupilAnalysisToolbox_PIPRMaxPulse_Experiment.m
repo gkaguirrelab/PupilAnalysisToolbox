@@ -4,13 +4,13 @@ userID = strtrim(userID);
 
 %% List of all the subjects and dates
 % Master list
-Subjects = {'MELA_0003' 'MELA_0026' 'MELA_0037' 'MELA_0038' 'MELA_0038' 'MELA_0039' 'MELA_0043' 'MELA_0049' 'MELA_0050' 'MELA_0071' 'MELA_0073' 'MELA_0074' 'MELA_0075' 'MELA_0077' 'MELA_0077' 'MELA_0078' 'MELA_0079' 'MELA_0080' 'MELA_0081' 'MELA_0082' 'MELA_0084' 'MELA_0085' 'MELA_0087' 'MELA_0088' 'MELA_0089' 'MELA_0090' 'MELA_0093' 'MELA_0093' 'MELA_0094' 'MELA_0096' 'MELA_0096' 'MELA_0097' 'MELA_0098' 'MELA_0100' 'MELA_0050' 'MELA_0090' 'MELA_0088' 'MELA_0026' 'MELA_0098' 'MELA_0082' 'MELA_0075' 'MELA_0003' 'MELA_0078' 'MELA_0100' 'MELA_0049' 'MELA_0079' 'MELA_0074' 'MELA_0084' 'MELA_0089' 'MELA_0037' 'MELA_0081' 'MELA_0073' 'MELA_0043' 'MELA_0077' 'MELA_0094' 'MELA_0080' 'MELA_0084' 'MELA_0085'};
-Dates = {'110316' '112116' '120616' '020217' '092916' '092716' '092816' '102716' '110116' '100616' '102016' '092716' '111116' '020217' '110216' '100416' '121616' '102416' '101116' '113016' '102716' '110916' '112916' '111716' '111616' '112216' '020117' '120116' '121516' '020117' '120916' '010917' '121416' '121616' '021317' '021517' '021617' '022017' '022117' '022217' '022217' '022317' '022317' '022417' '022417' '030117' '030817' '031017' '031317' '031517' '031717' '031717' '032217' '032217' '032317' '032417' '040717' '041317'};
-%%% DO NOT CHANGE THIS LIST APART FROM ADDING THE MOST RECENT SUBJECTS
+%Subjects = {'MELA_0003' 'MELA_0026' 'MELA_0037' 'MELA_0038' 'MELA_0038' 'MELA_0039' 'MELA_0043' 'MELA_0049' 'MELA_0050' 'MELA_0071' 'MELA_0073' 'MELA_0074' 'MELA_0075' 'MELA_0077' 'MELA_0077' 'MELA_0078' 'MELA_0079' 'MELA_0080' 'MELA_0081' 'MELA_0082' 'MELA_0084' 'MELA_0085' 'MELA_0087' 'MELA_0088' 'MELA_0089' 'MELA_0090' 'MELA_0093' 'MELA_0093' 'MELA_0094' 'MELA_0096' 'MELA_0096' 'MELA_0097' 'MELA_0098' 'MELA_0100' 'MELA_0050' 'MELA_0090' 'MELA_0088' 'MELA_0026' 'MELA_0098' 'MELA_0082' 'MELA_0075' 'MELA_0003' 'MELA_0078' 'MELA_0100' 'MELA_0049' 'MELA_0079' 'MELA_0074' 'MELA_0084' 'MELA_0089' 'MELA_0037' 'MELA_0081' 'MELA_0073' 'MELA_0043' 'MELA_0077' 'MELA_0094' 'MELA_0080' 'MELA_0084' 'MELA_0085'};
+%Dates = {'110316' '112116' '120616' '020217' '092916' '092716' '092816' '102716' '110116' '100616' '102016' '092716' '111116' '020217' '110216' '100416' '121616' '102416' '101116' '113016' '102716' '110916' '112916' '111716' '111616' '112216' '020117' '120116' '121516' '020117' '120916' '010917' '121416' '121616' '021317' '021517' '021617' '022017' '022117' '022217' '022217' '022317' '022317' '022417' '022417' '030117' '030817' '031017' '031317' '031517' '031717' '031717' '032217' '032217' '032317' '032417' '040717' '041317'};
+% DO NOT CHANGE THIS LIST APART FROM ADDING THE MOST RECENT SUBJECTS
 
 %% Change the below
-% Subjects = { };
-% Dates = { };
+Subjects = {'MELA_0093'};
+Dates = {'120116'};
 
 %% Params common to all components of the experiment
 
@@ -38,7 +38,7 @@ oldLabels = {'PIPRMaxPulse-PulsePIPRBlue_3s_MaxContrast17sSegment',...
 newLabels = {'PIPRBlue', 'PIPRRed', 'Background'};
 
 Protocol={'PIPRMaxPulse_PulsePIPR'};
-basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/' Protocol{1}];
+basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data_Through061317/' Protocol{1}];
 resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/' Protocol{1}];
 Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Dates, Protocol, newLabels, oldLabels, basePath, resultsPath);
 
@@ -51,7 +51,7 @@ oldLabels = {'PIPRMaxPulse-PulseMaxLMS_3s_MaxContrast17sSegment',...
 newLabels = {'MaxLMS', 'Background'};
 
 Protocol={'PIPRMaxPulse_PulseLMS'};
-basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/' Protocol{1}];
+basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data_Through061317/' Protocol{1}];
 resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/' Protocol{1}];
 Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Dates, Protocol, newLabels, oldLabels, basePath, resultsPath);
 
@@ -64,6 +64,6 @@ oldLabels = {'PIPRMaxPulse-PulseMaxMel_3s_MaxContrast17sSegment',...
 newLabels = {'MaxMel', 'Background'};
 
 Protocol={'PIPRMaxPulse_PulseMel'};
-basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data/' Protocol{1}];
+basePath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_data_Through061317/' Protocol{1}];
 resultsPath = ['/Users/' userID '/Dropbox (Aguirre-Brainard Lab)/MELA_analysis/' Protocol{1}];
 Data = PupilAnalysisToolbox_PulseSequentialTrialAnalysis(params, Subjects, Dates, Protocol, newLabels, oldLabels, basePath, resultsPath);
